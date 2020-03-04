@@ -1,0 +1,331 @@
+{
+	"info": {
+		"_postman_id": "060ec989-ce0a-45ea-9ee6-b13c8d235368",
+		"name": "Fagprove",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"mathias@munikum.no\",\n\t\"password\": \"testing\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Candidate List",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/person/listCandidates",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"person",
+						"listCandidates"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Examinator List",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/person/listExaminators",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"person",
+						"listExaminators"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Person",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"anders@munikum.no\",\n\t\"name\": \"Anders\",\n\t\"password\": \"testing\",\n\t\"role\": \"ROLE_MANAGER\",\n\t\"personType\": \"EXAMINATOR\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/person/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"person",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Person",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": 2,\n\t\"email\": \"mathias@munikum.no\",\n\t\"name\": \"Mathias updated\",\n\t\"password\": \"testing\",\n\t\"role\": \"ROLE_MANAGER\",\n\t\"personType\": \"EXAMINATOR\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/person/update",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"person",
+						"update"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Examination List",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/examination/list",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"examination",
+						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Examination",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/examination/show/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"examination",
+						"show",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Examination",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"candidate\": 1,\n\t\"responsibleExaminator\": 1,\n\t\"secondaryExaminator\": 1,\n\t\"startDate\": \"2020-03-03T13:19:23Z\",\n\t\"endDate\": \"2020-03-03T13:19:23Z\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/examination/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"examination",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Examination",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"candidate\": 1,\n\t\"responsibleExaminator\": 1,\n\t\"secondaryExaminator\": 1,\n\t\"startDate\": \"2020-03-03T13:19:23Z\",\n\t\"endDate\": \"2020-03-03T13:19:23Z\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/examination/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"examination",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Examination",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/examination/delete/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"examination",
+						"delete",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiJ9.eyJwcmluY2lwYWwiOiJINHNJQUFBQUFBQUFBSlZUUFc4VFFSUjhaeHdGRVFrU0pKQW9Rb1BwMEJtYkVCR1pnamlFS09Td2tSM0xrWkZBNjd2MVplTzkzV01cL1lydEJycUJJRVFSRVF1SXY1SjlBd3c5QVVOQ21wa084YytLY29Zblk2dlIyYm1iZXpOM2hFVXhwQlhkQ1JSalhic3h0eUlTclk4VkVxS2x2RlRNRDEycXFBbXBHaUxVUnNJRVRPRDVPQmh3UE1pd3djTm5iSWJza3o0a0k4OVgyRHZWTnFhK2dLRlY0d3RoUkpLSTlxYnJ1S2JjdkZmMUxJS1YyZm1kZ3VnVnp4UGVsRmFZaXhXb1wvWm9vR0xaaE5aNTcwdThub2lvODNWQmhHdUo2RVRsTkIycHdHSHN3UWE3WWxxaktxRFZ3Nk5tc040XC9rNk5TVVB6c2RFYTNUM3p5WjFrMWhQN2hPYkFqZDRDYThnMjQ4ZFBKamR6UVRxSmp6dWl1UWN0MlpTNkZ4RFJESmdIWmFJSVwvOXdcL3QzWFwvVVwvRFJnWUFNN2wxOWp2cFwvRm9aaHArZlwvN28rQ3RyeERWeWRzSjdDU3YwWTNjeWx6SnVLSnNyZlBqNTlmM0QwNXRrNVZFNFFqXC82XC9qOXp5U1hLREZSbkZSQkVqSnpwQzJsNDJlVWJ5OHRuazR4WUdicDFGTWFmNFJRbERnMU9KbEJqWHpTckp4M2tidUZDcmVxc3ZsaDgrV2FcLzBEZHpQRlVudTlsSnVvU0xadmNYOFZtaWJoZDVHczliUTFkcVd0ZXMyYXNzQzM0enZ0blRYRkJZMnl2WG00bHF2TXhpVVcwdEY3RGdpWnBzUlwvU0N5Z25WdDVBcUpDMXdjNVpjVTczb1NhOVwvNytmYkxcL28zdmFPWXhUTzBTYmluV041dUNLcWhDMWV2RGdcL21aRHpcLzJSbUdNZjR3XC9yTDh5YTF3REFBQT0iLCJzdWIiOiJtYXRoaWFzQG11bmlrdW0ubm8iLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlzcyI6IlNwcmluZyBTZWN1cml0eSBSRVNUIEdyYWlscyBQbHVnaW4iLCJleHAiOjE1ODMzNTE3NzYsImlhdCI6MTU4MzMxNTc3Nn0.hMtnGpGOmBWaBmBr1rhnSynws-eLs-76kpbeiBN1n0I",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "7c324486-e287-4ade-87aa-63f50fbb6964",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "cdbe8210-a0cc-4565-bb0b-611e69c81608",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
