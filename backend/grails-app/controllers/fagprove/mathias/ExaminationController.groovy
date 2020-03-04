@@ -30,6 +30,19 @@ class ExaminationController {
         render retVal as JSON
     }
 
+    def show(Long id) {
+        Examination examination = Examination.findById(id)
+
+        if(!examination) {
+            log.error("Examination with id $id not found")
+            render status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        render SuperHelper.renderExamination(examination) as JSON
+    }
+
+    @Secured('ROLE_ADMIN')
     def create(CreateExaminationCmd form) {
         form.validate()
 
@@ -49,25 +62,58 @@ class ExaminationController {
 
         examination.save(flush:true, failOnError:true)
 
+        log.info("Examination with id $examination.id created")
+
         render SuperHelper.renderExamination(examination) as JSON
     }
 
-    def show(Long id) {
-        Examination examination = Examination.findById(id)
+    @Secured('ROLE_ADMIN')
+    def update(UpdateExaminationCmd form) {
+        form.validate()
+
+        if(form.hasErrors()) {
+            log.error(form.errors.toString())
+            render status: HttpStatus.BAD_REQUEST
+            return
+        }
+
+        Examination examination = Examination.findById(form.id)
 
         if(!examination) {
+            log.error("Examination with id $form.id not found")
             render status: HttpStatus.NOT_FOUND
             return
         }
 
+        examination.candidate = form.candidate
+        examination.responsibleExaminator = form.responsibleExaminator
+        examination.secondaryExaminator = form.secondaryExaminator
+        examination.startDate = form.startDate
+        examination.endDate = form.endDate
+
+        examination.save(flush:true, failOnError:true)
+
+        log.info("Examination with id $form.id updated")
+
         render SuperHelper.renderExamination(examination) as JSON
     }
 
-    def update(UpdateExaminationCmd form) {
+    @Secured('ROLE_ADMIN')
+    def delete(Long id) {
+        Examination examination = Examination.findById(id)
 
+        if(!examination) {
+            log.error("Examination with id $id not found")
+            render status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        examination.delete(flush:true, failOnError: true)
+
+        log.info("Examination with id $id deleted")
+
+        render status: HttpStatus.OK
     }
-
-    def delete() {}
 }
 
 @GrailsCompileStatic
