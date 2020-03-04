@@ -74,7 +74,7 @@ class PersonController {
         new PersonRole(
                 person: person,
                 role: role
-        ).save(failOnError:true)
+        ).save(flush: true, failOnError:true)
 
         render SuperHelper.renderPerson(person) as JSON
     }
