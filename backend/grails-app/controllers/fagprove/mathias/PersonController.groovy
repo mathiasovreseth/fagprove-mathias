@@ -1,5 +1,6 @@
 package fagprove.mathias
 
+import enums.PersonType
 import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
 import grails.databinding.BindUsing
@@ -17,13 +18,11 @@ import org.springframework.http.HttpStatus
 @Transactional
 class PersonController {
 	static responseFormats = ['json', 'xml']
-	
-    def index() {
-        render "test" as JSON
-    }
 
-    def list() {
-        List<Person> persons = Person.findAll()
+    def index() { }
+
+    def listCandidates() {
+        List<Person> persons = Person.findAllByPersonType(PersonType.CANDIDATE)
 
         def retVal = []
 
@@ -32,6 +31,22 @@ class PersonController {
         }
 
         render retVal as JSON
+    }
+
+    def listExaminators() {
+        List<Person> persons = Person.findAllByPersonType(PersonType.EXAMINATOR)
+
+        def retVal = []
+
+        for(Person person in persons) {
+            retVal.add(SuperHelper.renderPerson(person))
+        }
+
+        render retVal as JSON
+    }
+
+    def show(Long id) {
+        render SuperHelper.renderPerson(Person.findById(id)) as JSON
     }
 
     def create(CreatePersonCmd form) {
@@ -53,7 +68,8 @@ class PersonController {
         Person person = new Person(
                 email: form.email,
                 name: form.name,
-                password: form.password
+                password: form.password,
+                personType: form.personType
         ).save(flush:true, failOnError:true)
         new PersonRole(
                 person: person,
@@ -61,10 +77,6 @@ class PersonController {
         ).save(failOnError:true)
 
         render SuperHelper.renderPerson(person) as JSON
-    }
-
-    def show(Long id) {
-        render SuperHelper.renderPerson(Person.findById(id)) as JSON
     }
 
     def update(UpdatePersonCmd form) {
@@ -86,6 +98,7 @@ class PersonController {
         person.email = form.email
         person.name = form.name
         person.password = form.password
+        person.personType = form.personType
 
         List<PersonRole> personRoles = PersonRole.findAllByPerson(person)
 
@@ -123,11 +136,14 @@ class CreatePersonCmd implements Validateable {
     String password
     String role
 
+    PersonType personType
+
     static constraints = {
         email email: true, nullable: false, blank: false
         name nullable: false, blank: false
         password nullable: false, blank: false
         role nullable: false
+        personType nullable: false
     }
 }
 
@@ -145,11 +161,14 @@ class UpdatePersonCmd implements Validateable {
     String password
     String role
 
+    PersonType personType
+
     static constraints = {
         id nullable: false
         email email: true, blank: false
         name nullable: false, blank: false
         password blank: false
         role nullable: false
+        personType nullable: false
     }
 }

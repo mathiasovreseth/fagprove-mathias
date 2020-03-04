@@ -1,5 +1,6 @@
 package fagprove.mathias
 
+import enums.PersonType
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
@@ -19,8 +20,8 @@ class InitService {
         if(!Role.findByAuthority('ROLE_ADMIN')) {
             new Role(
                     authority: 'ROLE_ADMIN',
-                    name: 'Superadmin',
-                    description: 'Superadministrator'
+                    name: 'Administrator',
+                    description: 'Administrator'
             ).save(flush: true, failOnError:true)
         }
 
@@ -28,7 +29,7 @@ class InitService {
             new Role(
                     authority: 'ROLE_USER',
                     name: 'Bruker',
-                    description: 'Vanlige brukerrettigheter'
+                    description: 'Bruker'
             ).save(failOnError:true)
         }
 
@@ -36,20 +37,33 @@ class InitService {
             new Role(
                     authority: 'ROLE_MANAGER',
                     name: 'Bidragsyter',
-                    description: 'Innholdsadministrator'
+                    description: 'Bidragsyter'
             ).save(failOnError:true)
         }
 
         if(!Person.count()) {
             Person person = new Person(
-                    email: "mathias@munikum.no",
-                    name: "Administrator",
-                    password: "testing"
+                    email: "kristoffer@munikum.no",
+                    name: "Kristoffer",
+                    password: "testing",
+                    personType: PersonType.EXAMINATOR
             )
             person.save(flush:true, failOnError:true)
             new PersonRole(
                     person: person,
                     role: Role.findByAuthority('ROLE_ADMIN')
+            ).save(failOnError:true)
+
+            Person person2 = new Person(
+                    email: "mathias@munikum.no",
+                    name: "Mathias",
+                    password: "testing",
+                    personType: PersonType.CANDIDATE
+            )
+            person2.save(flush:true, failOnError:true)
+            new PersonRole(
+                    person: person2,
+                    role: Role.findByAuthority('ROLE_USER')
             ).save(failOnError:true)
         }
 

@@ -1,5 +1,6 @@
 package fagprove.mathias
 
+import enums.PersonType
 import grails.util.Holders
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
@@ -22,6 +23,8 @@ class Person implements Serializable {
     Date dateCreated
     Date lastUpdated
 
+    PersonType personType
+
     Set<Role> getAuthorities() {
         PersonRole.findAllByPerson(this)*.role
     }
@@ -33,11 +36,13 @@ class Person implements Serializable {
         name blank:false, nullable: false
         description nullable: true, blank: true
         password blank: false, nullable: true
+        personType nullable: false
     }
 
     static mapping = {
         id generator:'sequence', params:[sequence:'person_seq']
         email index:'person_email_idx'
+        personType index:'person_type_idx'
         description type:'text'
     }
 

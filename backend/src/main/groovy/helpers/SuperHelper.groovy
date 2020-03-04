@@ -16,6 +16,7 @@ class SuperHelper {
                 dateCreated: person.dateCreated,
                 lastUpdated: person.lastUpdated,
                 description: person.description,
+                personType: person.personType.name(),
                 roles: renderPersonRole(PersonRole.findAllByPerson(person))
         ]
     }
