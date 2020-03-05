@@ -8,6 +8,9 @@
 		{
 			"name": "Login",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "POST",
 				"header": [
 					{
@@ -19,7 +22,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"email\": \"mathias@munikum.no\",\n\t\"password\": \"testing\"\n}",
+					"raw": "{\n\t\"email\": \"kristoffer@munikum.no\",\n\t\"password\": \"testing\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -95,7 +98,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"email\": \"anders@munikum.no\",\n\t\"name\": \"Anders\",\n\t\"password\": \"testing\",\n\t\"role\": \"ROLE_MANAGER\",\n\t\"personType\": \"EXAMINATOR\"\n}",
+					"raw": "{\n\t\"email\": \"anders2@munikum.no\",\n\t\"name\": \"Anders\",\n\t\"password\": \"testing\",\n\t\"role\": \"ROLE_MANAGER\",\n\t\"personType\": \"EXAMINATOR\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -131,7 +134,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"id\": 2,\n\t\"email\": \"mathias@munikum.no\",\n\t\"name\": \"Mathias updated\",\n\t\"password\": \"testing\",\n\t\"role\": \"ROLE_MANAGER\",\n\t\"personType\": \"EXAMINATOR\"\n}",
+					"raw": "{\n\t\"id\": 1,\n\t\"email\": \"kristoffer@munikum.no\",\n\t\"name\": \"Kristoffer updated\",\n\t\"password\": \"testing\",\n\t\"role\": \"ROLE_ADMIN\",\n\t\"personType\": \"EXAMINATOR\",\n\t\"committees\": [2]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -154,6 +157,42 @@
 			"response": []
 		},
 		{
+			"name": "Set Busy",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"person\": 3,\n\t\"from\": \"2020-04-01T00:00:00Z\",\n\t\"to\": \"2020-04-04T00:00:00Z\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/person/setBusy",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"person",
+						"setBusy"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Examination List",
 			"request": {
 				"method": "GET",
@@ -168,6 +207,42 @@
 					"path": [
 						"examination",
 						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Examination Calendar",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"startDate\": \"2020-02-01T00:00:00Z\",\n\t\"endDate\": \"2020-04-01T00:00:00Z\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/examination/calendar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"examination",
+						"calendar"
 					]
 				}
 			},
@@ -238,13 +313,13 @@
 					{
 						"key": "Content-Type",
 						"name": "Content-Type",
-						"value": "application/json",
-						"type": "text"
+						"type": "text",
+						"value": "application/json"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"candidate\": 1,\n\t\"responsibleExaminator\": 1,\n\t\"secondaryExaminator\": 1,\n\t\"startDate\": \"2020-03-03T13:19:23Z\",\n\t\"endDate\": \"2020-03-03T13:19:23Z\"\n}",
+					"raw": "{\n\t\"id\": 2,\n\t\"candidate\": 1,\n\t\"responsibleExaminator\": 1,\n\t\"secondaryExaminator\": 1,\n\t\"startDate\": \"2020-04-03T13:19:23Z\",\n\t\"endDate\": \"2020-04-03T13:19:23Z\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -252,7 +327,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/examination/create",
+					"raw": "http://localhost:8080/examination/update",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -260,7 +335,7 @@
 					"port": "8080",
 					"path": [
 						"examination",
-						"create"
+						"update"
 					]
 				}
 			},
@@ -293,6 +368,98 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Committee list",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/committee/list",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"committee",
+						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Committee",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Test\",\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/committee/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"committee",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Committee",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": 3,\n\t\"name\": \"Test 2\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/committee/update",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"committee",
+						"update"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {
@@ -300,7 +467,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiJ9.eyJwcmluY2lwYWwiOiJINHNJQUFBQUFBQUFBSlZUUFc4VFFSUjhaeHdGRVFrU0pKQW9Rb1BwMEJtYkVCR1pnamlFS09Td2tSM0xrWkZBNjd2MVplTzkzV01cL1lydEJycUJJRVFSRVF1SXY1SjlBd3c5QVVOQ21wa084YytLY29Zblk2dlIyYm1iZXpOM2hFVXhwQlhkQ1JSalhic3h0eUlTclk4VkVxS2x2RlRNRDEycXFBbXBHaUxVUnNJRVRPRDVPQmh3UE1pd3djTm5iSWJza3o0a0k4OVgyRHZWTnFhK2dLRlY0d3RoUkpLSTlxYnJ1S2JjdkZmMUxJS1YyZm1kZ3VnVnp4UGVsRmFZaXhXb1wvWm9vR0xaaE5aNTcwdThub2lvODNWQmhHdUo2RVRsTkIycHdHSHN3UWE3WWxxaktxRFZ3Nk5tc040XC9rNk5TVVB6c2RFYTNUM3p5WjFrMWhQN2hPYkFqZDRDYThnMjQ4ZFBKamR6UVRxSmp6dWl1UWN0MlpTNkZ4RFJESmdIWmFJSVwvOXdcL3QzWFwvVVwvRFJnWUFNN2wxOWp2cFwvRm9aaHArZlwvN28rQ3RyeERWeWRzSjdDU3YwWTNjeWx6SnVLSnNyZlBqNTlmM0QwNXRrNVZFNFFqXC82XC9qOXp5U1hLREZSbkZSQkVqSnpwQzJsNDJlVWJ5OHRuazR4WUdicDFGTWFmNFJRbERnMU9KbEJqWHpTckp4M2tidUZDcmVxc3ZsaDgrV2FcLzBEZHpQRlVudTlsSnVvU0xadmNYOFZtaWJoZDVHczliUTFkcVd0ZXMyYXNzQzM0enZ0blRYRkJZMnl2WG00bHF2TXhpVVcwdEY3RGdpWnBzUlwvU0N5Z25WdDVBcUpDMXdjNVpjVTczb1NhOVwvNytmYkxcL28zdmFPWXhUTzBTYmluV041dUNLcWhDMWV2RGdcL21aRHpcLzJSbUdNZjR3XC9yTDh5YTF3REFBQT0iLCJzdWIiOiJtYXRoaWFzQG11bmlrdW0ubm8iLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlzcyI6IlNwcmluZyBTZWN1cml0eSBSRVNUIEdyYWlscyBQbHVnaW4iLCJleHAiOjE1ODMzNTE3NzYsImlhdCI6MTU4MzMxNTc3Nn0.hMtnGpGOmBWaBmBr1rhnSynws-eLs-76kpbeiBN1n0I",
+				"value": "eyJhbGciOiJIUzI1NiJ9.eyJwcmluY2lwYWwiOiJINHNJQUFBQUFBQUFBSlZUUDJcL1RRQno5T2FRcW9oSzBTRVZpS0F0aFF3NGtnZ3FGZ1RZTnBjVWtGVW1FRkNUUXhiNjRsNXp2M1B1VE9ndktCRU9ISXFBU0VsK2gzd1FXUGdDQ2diVXpHK0xPYmVyQVVuR1Q5YnZuOTk3dlBmdndDR2FrZ0hJb0VLSFNqYWtPQ1hObExBZ0xKZmExSUdya2FvbEZnRldLV0UrQmJUT0I0K1Brd1BFZ1J3SUZsNzArR3FJaVJTd3NOcnA5N0t0S0lxREVSWGpDMkJNb3dydGNETnhUYnA4TFwvSmRBUnUzOHpzRnNCeGFRNzNQTlZKMnpXaElUZ1lNT3pHY3pqXC9zRE8xcjB6UTFtaWlBcXA2R3ptS0V1eFlFSGMwaXJiVzVVQ1pZS0xoMmIxWXJRWWhPcmlnZm5ZeVNsY2ZmUEprMWxyZHQ3YTVPWkRYYmdGZVNUMkRISFpIZkRRbDNMNDFZNXBXWnJ3cGtzdEZuRUE5SWpWdHp3ajVmZWZkM1wvTkc3bkFFd21OODkrSjV0ZlhZWHg1eGVcL3JxVkJPNzZDSzFQV00xZ2xpWTJiaFl5NUpiQlZcL3ZaeDZcLzNCMFp2bjU0eXlSVHo4XC96NEtLeWZKamFvOGlwRkFpazkxWkdoMzhcL2Jaa0srZVRUNXBZZVEyU1JSVGJMNG9wbkJ3S3BFUm0zWHpndE5KM2dvdVBHMTR0WmNyYTA4MjZvbUMrNFVTS3R5NlY5aHUxZFhqcldHdlhNZkx0RlF0cjFmMTNXcGo4MDVcL0I0ZkxaSzFHT1c4bDlOSEdNODNqS09oUWNydGQxZ29XQjRKSXhYczlMQjVFbXBHQmpsekd6UTRYMHdodDk2N0hUZk43UDk5KzJiXC8rM2ZqWmhKa2hvaHFiQnVjelVGMUhYU3hlSHg0c3pYMzRzWmZtTWZrM1wvZ0Frck5MUVh3TUFBQT09Iiwic3ViIjoia3Jpc3RvZmZlckBtdW5pa3VtLm5vIiwicm9sZXMiOlsiUk9MRV9BRE1JTiJdLCJpc3MiOiJTcHJpbmcgU2VjdXJpdHkgUkVTVCBHcmFpbHMgUGx1Z2luIiwiZXhwIjoxNTgzNDM3MTYzLCJpYXQiOjE1ODM0MDExNjN9.Y7oTDCMPHueNTJjgzmUNnHjlCCJI5mMk9UUvBlCVXgo",
 				"type": "string"
 			}
 		]

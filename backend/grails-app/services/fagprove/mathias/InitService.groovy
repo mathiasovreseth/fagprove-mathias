@@ -15,66 +15,137 @@ import reactor.spring.context.annotation.Selector
 @Transactional
 class InitService {
 
+    PersonService personService
+
     @Selector('gorm:datastoreInitialized')
     def init() {
-        if(!Role.findByAuthority('ROLE_ADMIN')) {
-            new Role(
+        if(!Person.count()) {
+            Calendar c = Calendar.getInstance()
+
+            Role admin = new Role(
                     authority: 'ROLE_ADMIN',
                     name: 'Administrator',
                     description: 'Administrator'
-            ).save(flush: true, failOnError:true)
-        }
+            )
+            admin.save(flush: true, failOnError: true)
 
-        if(!Role.findByAuthority('ROLE_USER')) {
-            new Role(
+            Role user = new Role(
                     authority: 'ROLE_USER',
                     name: 'Bruker',
                     description: 'Bruker'
-            ).save(failOnError:true)
-        }
+            )
+            user.save(failOnError: true)
 
-        if(!Role.findByAuthority('ROLE_MANAGER')) {
-            new Role(
+
+            Role manager = new Role(
                     authority: 'ROLE_MANAGER',
                     name: 'Bidragsyter',
                     description: 'Bidragsyter'
-            ).save(failOnError:true)
-        }
+            )
+            manager.save(failOnError: true)
 
-        if(!Person.count()) {
-            Person person = new Person(
+            Committee dataelektronikar = new Committee(
+                    name: "Dataelektronikar"
+            )
+            dataelektronikar.save(failOnError: true)
+            Committee ikt_servicefag = new Committee(
+                    name: "IKT-servicefag"
+            )
+            ikt_servicefag.save(flush:true, failOnError: true)
+
+            Person kristoffer = new Person(
                     email: "kristoffer@munikum.no",
                     name: "Kristoffer",
                     password: "testing",
-                    personType: PersonType.EXAMINATOR
-            )
-            person.save(flush:true, failOnError:true)
+                    personType: PersonType.ADMIN)
+            kristoffer.save(flush: true, failOnError: true)
             new PersonRole(
-                    person: person,
-                    role: Role.findByAuthority('ROLE_ADMIN')
-            ).save(failOnError:true)
+                    person: kristoffer,
+                    role: admin
+            ).save(failOnError: true)
 
-            Person person2 = new Person(
+            Person mathias = new Person(
                     email: "mathias@munikum.no",
                     name: "Mathias",
                     password: "testing",
-                    personType: PersonType.CANDIDATE
+                    personType: PersonType.CANDIDATE,
+                    phoneNumber: "+4711223344",
+                    region: "Stad kommune",
+                    company: "Munikum AS",
+                    registrationReceived: true
             )
-            person2.save(flush:true, failOnError:true)
+            mathias.save(flush: true, failOnError: true)
             new PersonRole(
-                    person: person2,
-                    role: Role.findByAuthority('ROLE_USER')
-            ).save(failOnError:true)
-        }
+                    person: mathias,
+                    role: user
+            ).save(failOnError: true)
 
-        if(!Examination.count()) {
+            Person roar = new Person(
+                    email: "roar@example.com",
+                    name: "Roar Grønmo",
+                    password: "testing",
+                    personType: PersonType.EXAMINATOR,
+                    jobRole: "Medlem",
+                    phoneNumber: "+4711223344",
+            )
+            roar.addToCommittees(dataelektronikar)
+            roar.addToCommittees(ikt_servicefag)
+            roar.save(flush: true, failOnError: true)
+            new PersonRole(
+                    person: roar,
+                    role: admin
+            ).save(failOnError: true)
+
+            c.set(2020, Calendar.FEBRUARY, 3)
+            Date roarBusyStart = c.getTime()
+            c.set(2020, Calendar.FEBRUARY, 14)
+            Date roarBusyEnd = c.getTime()
+            personService.setBusy(roar, roarBusyStart, roarBusyEnd)
+
+            Person mads = new Person(
+                    email: "mads@example.com",
+                    name: "Mads Masdal",
+                    password: "testing",
+                    personType: PersonType.EXAMINATOR,
+                    jobRole: "Medlem",
+                    phoneNumber: "+4711223344",
+            )
+            mads.addToCommittees(dataelektronikar)
+            mads.addToCommittees(ikt_servicefag)
+            mads.save(flush: true, failOnError: true)
+            new PersonRole(
+                    person: mads,
+                    role: manager
+            ).save(failOnError: true)
+
+            Person randi = new Person(
+                    email: "randi@example.com",
+                    name: "Randi Scheflo",
+                    password: "testing",
+                    personType: PersonType.EXAMINATOR,
+                    jobRole: "Leiar",
+                    phoneNumber: "+4711223344",
+            )
+            randi.addToCommittees(dataelektronikar)
+            randi.addToCommittees(ikt_servicefag)
+            randi.save(flush: true, failOnError: true)
+            new PersonRole(
+                    person: randi,
+                    role: manager
+            ).save(failOnError: true)
+
+            c.set(2020, Calendar.MARCH, 10, 8, 0 ,0)
+            Date start = c.getTime()
+            c.add(Calendar.DATE, 1)
+            Date end = c.getTime()
+
             new Examination(
-                    candidate: Person.load(1),
-                    responsibleExaminator: Person.load(1),
-                    secondaryExaminator: Person.load(1),
-                    startDate: new Date(),
-                    endDate: new Date()
-            ).save(flush: true, failOnError:true)
+                    candidate: mathias,
+                    responsibleExaminator: roar,
+                    secondaryExaminator: randi,
+                    startDate: start,
+                    endDate: end
+            ).save(flush: true, failOnError: true)
         }
     }
 }

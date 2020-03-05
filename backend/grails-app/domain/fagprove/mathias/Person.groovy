@@ -17,6 +17,12 @@ class Person implements Serializable {
     String email
     String name
     String description
+    String jobRole
+    String phoneNumber
+    String company
+    String region
+
+    Boolean registrationReceived
 
     String password
 
@@ -24,6 +30,16 @@ class Person implements Serializable {
     Date lastUpdated
 
     PersonType personType
+
+    static mappedBy = [
+            committees: "members"
+    ]
+
+    static belongsTo = Committee
+
+    static hasMany = [
+            committees: Committee
+    ]
 
     Set<Role> getAuthorities() {
         PersonRole.findAllByPerson(this)*.role
@@ -37,6 +53,11 @@ class Person implements Serializable {
         description nullable: true, blank: true
         password blank: false, nullable: true
         personType nullable: false
+        jobRole nullable: true
+        phoneNumber nullable: true
+        company nullable: true
+        region nullable: true
+        registrationReceived nullable: true
     }
 
     static mapping = {

@@ -1,5 +1,5 @@
 package enums
 
 enum PersonType {
-    CANDIDATE, EXAMINATOR
+    CANDIDATE, EXAMINATOR, ADMIN
 }

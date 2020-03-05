@@ -1,9 +1,6 @@
 package helpers
 
-import fagprove.mathias.Examination
-import fagprove.mathias.Person
-import fagprove.mathias.PersonRole
-import fagprove.mathias.Role
+import fagprove.mathias.*
 import grails.compiler.GrailsCompileStatic
 
 @GrailsCompileStatic
@@ -18,6 +15,58 @@ class SuperHelper {
                 description: person.description,
                 personType: person.personType.name(),
                 roles: renderPersonRole(PersonRole.findAllByPerson(person))
+        ]
+    }
+
+    static Map renderExaminator(Person person) {
+        Set<Committee> committees = person.committees
+
+        def c = []
+        for(Committee committee in committees) {
+            c.add(renderCommittee(committee))
+        }
+
+        return [
+                id: person.id,
+                email: person.email,
+                name: person.name,
+                dateCreated: person.dateCreated,
+                lastUpdated: person.lastUpdated,
+                description: person.description,
+                phoneNumber: person.phoneNumber,
+                jobRole: person.jobRole,
+                committees: c
+        ]
+    }
+
+    static Map renderCandidate(Person person) {
+        Examination examination = Examination.findByCandidateAndActive(
+                person, true
+        )
+
+        return [
+                id: person.id,
+                email: person.email,
+                name: person.name,
+                dateCreated: person.dateCreated,
+                lastUpdated: person.lastUpdated,
+                description: person.description,
+                company: person.company,
+                phoneNumber: person.phoneNumber,
+                region: person.region,
+                registrationReceived: person.registrationReceived,
+                examinationPlanned: examination != null,
+                examinationStartDate: examination.startDate,
+                examinationEndDate: examination.endDate,
+                examinationResponsible: renderExaminator(examination.responsibleExaminator),
+                examinationSecondary: renderExaminator(examination.secondaryExaminator),
+        ]
+    }
+
+    static Map renderCommittee(Committee committee) {
+        return [
+                id: committee.id,
+                name: committee.name
         ]
     }
 
@@ -42,9 +91,9 @@ class SuperHelper {
     static Map renderExamination(Examination examination) {
         return [
                 id: examination.id,
-                candidate: renderPerson(examination.candidate),
-                responsibleExaminator: renderPerson(examination.responsibleExaminator),
-                secondaryExaminator: renderPerson(examination.secondaryExaminator),
+                candidate: renderCandidate(examination.candidate),
+                responsibleExaminator: renderExaminator(examination.responsibleExaminator),
+                secondaryExaminator: renderExaminator(examination.secondaryExaminator),
                 startDate: examination.startDate,
                 endDate: examination.endDate
         ]

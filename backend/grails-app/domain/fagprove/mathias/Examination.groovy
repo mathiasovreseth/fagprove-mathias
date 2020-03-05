@@ -15,6 +15,8 @@ class Examination {
     Date dateCreated
     Date lastUpdated
 
+    Boolean active = true
+
     static belongsTo = [
             Person
     ]
@@ -25,6 +27,9 @@ class Examination {
         secondaryExaminator nullable: false
         startDate nullable: false
         endDate nullable: false
+
+        // Only one active examination per candidate
+        active nullable: false, unique: 'candidate'
     }
 
     static mapping = {

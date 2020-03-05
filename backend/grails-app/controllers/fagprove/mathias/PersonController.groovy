@@ -19,6 +19,8 @@ import org.springframework.http.HttpStatus
 class PersonController {
 	static responseFormats = ['json', 'xml']
 
+    PersonService personService
+
     def index() { }
 
     def listCandidates() {
@@ -27,7 +29,7 @@ class PersonController {
         def retVal = []
 
         for(Person person in persons) {
-            retVal.add(SuperHelper.renderPerson(person))
+            retVal.add(SuperHelper.renderCandidate(person))
         }
 
         render retVal as JSON
@@ -39,7 +41,7 @@ class PersonController {
         def retVal = []
 
         for(Person person in persons) {
-            retVal.add(SuperHelper.renderPerson(person))
+            retVal.add(SuperHelper.renderExaminator(person))
         }
 
         render retVal as JSON
@@ -69,12 +71,24 @@ class PersonController {
                 email: form.email,
                 name: form.name,
                 password: form.password,
-                personType: form.personType
+                personType: form.personType,
+                jobRole: form.jobRole,
+                phoneNumber: form.phoneNumber,
+                company: form.company,
+                region: form.region,
+                registrationReceived: form.registrationReceived
         ).save(flush:true, failOnError:true)
         new PersonRole(
                 person: person,
                 role: role
         ).save(flush: true, failOnError:true)
+
+        if(form.committees) {
+            for(Long c in form.committees) {
+                person.addToCommittees(Committee.load(c))
+            }
+            person.save()
+        }
 
         render SuperHelper.renderPerson(person) as JSON
     }
@@ -99,6 +113,11 @@ class PersonController {
         person.name = form.name
         person.password = form.password
         person.personType = form.personType
+        person.jobRole = form.jobRole
+        person.phoneNumber = form.phoneNumber
+        person.company = form.company
+        person.region = form.region
+        person.registrationReceived = form.registrationReceived
 
         List<PersonRole> personRoles = PersonRole.findAllByPerson(person)
 
@@ -118,10 +137,56 @@ class PersonController {
             personRoleToDelete.delete(flush: true, failOnError: true)
         }
 
+        if(form.committees != null) {
+            List<Committee> committeesToDelete = []
+            for(Committee c in person.committees) {
+                boolean shouldDelete = true
+                for(Long c2 in form.committees) {
+                    if(c.id == c2) {
+                        shouldDelete = false
+                        break
+                    }
+                }
+                if(shouldDelete) {
+                    committeesToDelete.add(c)
+                }
+            }
+            for(Committee c in committeesToDelete) {
+                person.removeFromCommittees(c)
+            }
+
+            for(Long c in form.committees) {
+                person.addToCommittees(Committee.load(c))
+            }
+            person.save()
+        }
+
         render SuperHelper.renderPerson(person) as JSON
     }
 
     def delete() {}
+
+    def setBusy(SetBusyCmd form) {
+        form.validate()
+
+        if(form.hasErrors()) {
+            log.error(form.errors.toString())
+            render status: HttpStatus.BAD_REQUEST
+            return
+        }
+
+        Person person = Person.findById(form.person)
+
+        if(!person) {
+            log.error("Person not found")
+            render status: HttpStatus.BAD_REQUEST
+            return
+        }
+
+        personService.setBusy(person, form.from, form.to)
+
+        render text: '', status: HttpStatus.OK
+    }
 }
 
 @GrailsCompileStatic
@@ -135,8 +200,15 @@ class CreatePersonCmd implements Validateable {
     String name
     String password
     String role
+    String jobRole
+    String phoneNumber
+    String company
+    String region
+    Boolean registrationReceived
 
     PersonType personType
+
+    List<Long> committees
 
     static constraints = {
         email email: true, nullable: false, blank: false
@@ -144,6 +216,12 @@ class CreatePersonCmd implements Validateable {
         password nullable: false, blank: false
         role nullable: false
         personType nullable: false
+        jobRole nullable: true
+        phoneNumber nullable: true
+        company nullable: true
+        region nullable: true
+        registrationReceived nullable: true
+        committees nullable: true
     }
 }
 
@@ -160,8 +238,15 @@ class UpdatePersonCmd implements Validateable {
     String name
     String password
     String role
+    String jobRole
+    String phoneNumber
+    String company
+    String region
+    Boolean registrationReceived
 
     PersonType personType
+
+    List<Long> committees
 
     static constraints = {
         id nullable: false
@@ -170,5 +255,25 @@ class UpdatePersonCmd implements Validateable {
         password blank: false
         role nullable: false
         personType nullable: false
+        jobRole nullable: true
+        phoneNumber nullable: true
+        company nullable: true
+        region nullable: true
+        registrationReceived nullable: true
+        committees nullable: true
+    }
+}
+
+@GrailsCompileStatic
+class SetBusyCmd implements Validateable {
+
+    Long person
+    Date from
+    Date to
+
+    static constraints = {
+        person nullable: false
+        from nullable: false
+        to nullable: false
     }
 }
