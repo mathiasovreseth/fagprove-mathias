@@ -1,7 +1,7 @@
 package fagprove.mathias
 
-import cmd.CreatePersonCmd
-import cmd.UpdatePersonCmd
+import fagprove.mathias.cmd.CreatePersonCmd
+import fagprove.mathias.cmd.UpdatePersonCmd
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 

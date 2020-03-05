@@ -1,6 +1,6 @@
 package fagprove.mathias
 
-import cmd.LoginCommand
+import fagprove.mathias.cmd.LoginCommand
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured

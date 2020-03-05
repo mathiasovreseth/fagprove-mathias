@@ -1,13 +1,11 @@
-package cmd
+package fagprove.mathias.cmd
 
 import fagprove.mathias.Person
 import grails.compiler.GrailsCompileStatic
 import grails.validation.Validateable
 
 @GrailsCompileStatic
-class UpdateExaminationCmd implements Validateable {
-
-    Long id
+class CreateExaminationCmd implements Validateable {
 
     Person candidate
     Person responsibleExaminator
@@ -17,7 +15,6 @@ class UpdateExaminationCmd implements Validateable {
     Date endDate
 
     static constraints = {
-        id nullable: false
         candidate nullable: false
         responsibleExaminator nullable: false
         secondaryExaminator nullable: false

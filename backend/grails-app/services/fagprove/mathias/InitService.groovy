@@ -1,8 +1,8 @@
 package fagprove.mathias
 
-import cmd.CreateExaminationCmd
-import cmd.CreatePersonCmd
-import enums.PersonType
+import fagprove.mathias.cmd.CreateExaminationCmd
+import fagprove.mathias.cmd.CreatePersonCmd
+import fagprove.mathias.enums.PersonType
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j

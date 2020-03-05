@@ -1,7 +1,7 @@
 package fagprove.mathias
 
-import cmd.CreateCommitteeCmd
-import cmd.UpdateCommitteeCmd
+import fagprove.mathias.cmd.CreateCommitteeCmd
+import fagprove.mathias.cmd.UpdateCommitteeCmd
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 

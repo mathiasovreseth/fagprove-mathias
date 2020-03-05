@@ -1,4 +1,4 @@
-package helpers
+package fagprove.mathias.helpers
 
 import fagprove.mathias.*
 import grails.compiler.GrailsCompileStatic

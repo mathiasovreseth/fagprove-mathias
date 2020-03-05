@@ -1,6 +1,6 @@
 package fagprove.mathias
 
-import enums.PersonType
+import fagprove.mathias.enums.PersonType
 import grails.util.Holders
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString

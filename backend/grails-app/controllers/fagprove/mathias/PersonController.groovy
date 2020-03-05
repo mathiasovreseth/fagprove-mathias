@@ -1,20 +1,20 @@
 package fagprove.mathias
 
-import cmd.CreatePersonCmd
-import cmd.SetBusyCmd
-import cmd.UpdatePersonCmd
-import enums.PersonType
+import fagprove.mathias.cmd.CreatePersonCmd
+import fagprove.mathias.cmd.SetBusyCmd
+import fagprove.mathias.cmd.UpdatePersonCmd
+import fagprove.mathias.enums.PersonType
+import fagprove.mathias.helpers.SuperHelper
 import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
-import helpers.SuperHelper
 import org.springframework.http.HttpStatus
 
 @GrailsCompileStatic
-@Secured('ROLE_ADMIN')
+@Secured('ROLE_MANAGER')
 @Slf4j
 @Transactional
 class PersonController {
@@ -62,6 +62,15 @@ class PersonController {
             return
         }
 
+        if(form.personType == PersonType.EXAMINATOR) {
+            Person currentUser = (Person)springSecurityService.getCurrentUser()
+            if(!SuperHelper.isAdmin(currentUser)) {
+                log.error("Only admins can create examinators")
+                render status: HttpStatus.FORBIDDEN
+                return
+            }
+        }
+
         Person person = personService.create(form)
 
         if(!person) {
@@ -89,6 +98,17 @@ class PersonController {
             return
         }
 
+        if(person.personType == PersonType.EXAMINATOR ||
+                form.personType == PersonType.EXAMINATOR
+        ) {
+            Person currentUser = (Person)springSecurityService.getCurrentUser()
+            if(!SuperHelper.isAdmin(currentUser)) {
+                log.error("Only admins can update examinators")
+                render status: HttpStatus.FORBIDDEN
+                return
+            }
+        }
+
         person = personService.update(person, form)
 
         if(!person) {
@@ -102,7 +122,6 @@ class PersonController {
 
     def delete() {}
 
-    @Secured('ROLE_MANAGER')
     def setBusy(SetBusyCmd form) {
         form.validate()
 

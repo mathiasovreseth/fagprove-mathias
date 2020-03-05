@@ -1,17 +1,15 @@
-package cmd
+package fagprove.mathias.cmd
 
-import enums.PersonType
+import fagprove.mathias.enums.PersonType
 import grails.compiler.GrailsCompileStatic
 import grails.databinding.BindUsing
 import grails.databinding.SimpleMapDataBindingSource
 import grails.validation.Validateable
 
 @GrailsCompileStatic
-class UpdatePersonCmd implements Validateable {
+class CreatePersonCmd implements Validateable {
 
-    Long id
-
-    @BindUsing( { UpdatePersonCmd obj, SimpleMapDataBindingSource source ->
+    @BindUsing( { CreatePersonCmd obj, SimpleMapDataBindingSource source ->
         String email = source['email'] as String
         return email.toLowerCase()
     })
@@ -30,10 +28,9 @@ class UpdatePersonCmd implements Validateable {
     List<Long> committees
 
     static constraints = {
-        id nullable: false
-        email email: true, blank: false
+        email email: true, nullable: false, blank: false
         name nullable: false, blank: false
-        password blank: false
+        password nullable: false, blank: false
         role nullable: false
         personType nullable: false
         jobRole nullable: true
@@ -44,4 +41,3 @@ class UpdatePersonCmd implements Validateable {
         committees nullable: true
     }
 }
-

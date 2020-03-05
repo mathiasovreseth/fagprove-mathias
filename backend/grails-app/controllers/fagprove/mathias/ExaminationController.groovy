@@ -1,15 +1,15 @@
 package fagprove.mathias
 
-import cmd.CalendarListCmd
-import cmd.CreateExaminationCmd
-import cmd.UpdateExaminationCmd
-import enums.PersonType
+import fagprove.mathias.cmd.CalendarListCmd
+import fagprove.mathias.cmd.CreateExaminationCmd
+import fagprove.mathias.cmd.UpdateExaminationCmd
+import fagprove.mathias.enums.PersonType
+import fagprove.mathias.helpers.SuperHelper
 import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
-import helpers.SuperHelper
 import org.springframework.http.HttpStatus
 
 @GrailsCompileStatic

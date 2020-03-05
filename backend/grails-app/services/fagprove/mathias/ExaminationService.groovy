@@ -1,7 +1,7 @@
 package fagprove.mathias
 
-import cmd.CreateExaminationCmd
-import cmd.UpdateExaminationCmd
+import fagprove.mathias.cmd.CreateExaminationCmd
+import fagprove.mathias.cmd.UpdateExaminationCmd
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 

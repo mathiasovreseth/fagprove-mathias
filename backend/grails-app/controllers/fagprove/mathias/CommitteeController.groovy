@@ -1,13 +1,13 @@
 package fagprove.mathias
 
-import cmd.CreateCommitteeCmd
-import cmd.UpdateCommitteeCmd
+import fagprove.mathias.cmd.CreateCommitteeCmd
+import fagprove.mathias.cmd.UpdateCommitteeCmd
+import fagprove.mathias.helpers.SuperHelper
 import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
-import helpers.SuperHelper
 import org.springframework.http.HttpStatus
 
 @GrailsCompileStatic

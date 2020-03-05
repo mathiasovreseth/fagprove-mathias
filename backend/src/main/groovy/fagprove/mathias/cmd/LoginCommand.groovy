@@ -1,4 +1,4 @@
-package cmd
+package fagprove.mathias.cmd
 
 import grails.compiler.GrailsCompileStatic
 import grails.databinding.BindUsing
