@@ -98,4 +98,14 @@ class SuperHelper {
                 endDate: examination.endDate
         ]
     }
+
+    static boolean isAdmin(Person person) {
+        List<PersonRole> personRoles = PersonRole.findAllByPerson(person)
+        for(PersonRole role in personRoles) {
+            if(role.role.authority.equals("ROLE_ADMIN")) {
+                return true
+            }
+        }
+        return false
+    }
 }

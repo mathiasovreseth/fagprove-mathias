@@ -11,10 +11,8 @@ class AuthService {
 
     Person validateLogin(String email, String password) {
         Person person = Person.findByEmail(email)
-        if(person) {
-            if(person.validateLogin(password)) {
-                return person
-            }
+        if(person && person.validateLogin(password)) {
+            return person
         }
         return null
     }

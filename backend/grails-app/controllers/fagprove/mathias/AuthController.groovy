@@ -1,14 +1,12 @@
 package fagprove.mathias
 
+import cmd.LoginCommand
 import grails.compiler.GrailsCompileStatic
-import grails.databinding.BindUsing
-import grails.databinding.SimpleMapDataBindingSource
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import grails.plugin.springsecurity.rest.token.AccessToken
 import grails.plugin.springsecurity.rest.token.generation.TokenGenerator
 import grails.plugin.springsecurity.rest.token.rendering.AccessTokenJsonRenderer
-import grails.validation.Validateable
 import groovy.util.logging.Slf4j
 import org.springframework.security.core.userdetails.UserDetailsService
 
@@ -20,7 +18,7 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED
 @Slf4j
 @Transactional
 class AuthController {
-	static responseFormats = ['json', 'xml']
+	static responseFormats = ['json']
 
     AuthService authService
     AccessTokenJsonRenderer accessTokenJsonRenderer
@@ -40,6 +38,8 @@ class AuthController {
             return
         }
 
+        log.info("User $person.name logged in")
+
         renderToken(createToken(person))
     }
 
@@ -58,22 +58,5 @@ class AuthController {
                 userDetailsService.loadUserByUsername(person.email)
         )
         return token
-    }
-}
-
-@GrailsCompileStatic
-class LoginCommand implements Validateable {
-
-    @BindUsing( { LoginCommand obj, SimpleMapDataBindingSource source ->
-        String email = source['email'] as String
-        return email.toLowerCase()
-    })
-    String email
-
-    String password
-
-    static constraints = {
-        email email: true, blank: false
-        password blank: false
     }
 }

@@ -1,11 +1,13 @@
 package fagprove.mathias
 
+import cmd.CalendarListCmd
+import cmd.CreateExaminationCmd
+import cmd.UpdateExaminationCmd
 import enums.PersonType
 import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured
-import grails.validation.Validateable
 import groovy.util.logging.Slf4j
 import helpers.SuperHelper
 import org.springframework.http.HttpStatus
@@ -15,7 +17,9 @@ import org.springframework.http.HttpStatus
 @Slf4j
 @Transactional
 class ExaminationController {
-	static responseFormats = ['json', 'xml']
+	static responseFormats = ['json']
+
+    ExaminationService examinationService
 
     def index() { }
 
@@ -37,6 +41,8 @@ class ExaminationController {
             day.day = c.get(Calendar.DATE)
             day.dayOfWeek = c.get(Calendar.DAY_OF_WEEK)
             day.week = c.get(Calendar.WEEK_OF_YEAR)
+            day.month = c.get(Calendar.MONTH) + 1
+            day.year = c.get(Calendar.YEAR)
 
             Long dateSpanStart = c.getTimeInMillis()
             Long dateSpanEnd = c.getTimeInMillis() + 1000 * 60 * 60 * 24
@@ -122,17 +128,7 @@ class ExaminationController {
             return
         }
 
-        Examination examination = new Examination(
-                candidate: form.candidate,
-                responsibleExaminator: form.responsibleExaminator,
-                secondaryExaminator: form.secondaryExaminator,
-                startDate: form.startDate,
-                endDate: form.endDate
-        )
-
-        examination.save(flush:true, failOnError:true)
-
-        log.info("Examination with id $examination.id created")
+        Examination examination = examinationService.create(form)
 
         render SuperHelper.renderExamination(examination) as JSON
     }
@@ -155,16 +151,6 @@ class ExaminationController {
             return
         }
 
-        examination.candidate = form.candidate
-        examination.responsibleExaminator = form.responsibleExaminator
-        examination.secondaryExaminator = form.secondaryExaminator
-        examination.startDate = form.startDate
-        examination.endDate = form.endDate
-
-        examination.save(flush:true, failOnError:true)
-
-        log.info("Examination with id $form.id updated")
-
         render SuperHelper.renderExamination(examination) as JSON
     }
 
@@ -180,62 +166,8 @@ class ExaminationController {
 
         examination.delete(flush:true, failOnError: true)
 
-        log.info("Examination with id $id deleted")
+        log.info("Examination for candidate $examination.candidate.name deleted")
 
         render status: HttpStatus.OK
-    }
-}
-
-@GrailsCompileStatic
-class CalendarListCmd implements Validateable {
-
-    Date startDate
-    Date endDate
-
-    static constraints = {
-        startDate nullable: false
-        endDate nullable: false
-    }
-}
-
-
-@GrailsCompileStatic
-class CreateExaminationCmd implements Validateable {
-
-    Person candidate
-    Person responsibleExaminator
-    Person secondaryExaminator
-
-    Date startDate
-    Date endDate
-
-    static constraints = {
-        candidate nullable: false
-        responsibleExaminator nullable: false
-        secondaryExaminator nullable: false
-        startDate nullable: false
-        endDate nullable: false
-    }
-}
-
-@GrailsCompileStatic
-class UpdateExaminationCmd implements Validateable {
-
-    Long id
-
-    Person candidate
-    Person responsibleExaminator
-    Person secondaryExaminator
-
-    Date startDate
-    Date endDate
-
-    static constraints = {
-        id nullable: false
-        candidate nullable: false
-        responsibleExaminator nullable: false
-        secondaryExaminator nullable: false
-        startDate nullable: false
-        endDate nullable: false
     }
 }

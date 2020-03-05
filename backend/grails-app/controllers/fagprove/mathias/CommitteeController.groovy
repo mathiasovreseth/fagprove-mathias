@@ -1,11 +1,11 @@
 package fagprove.mathias
 
-
+import cmd.CreateCommitteeCmd
+import cmd.UpdateCommitteeCmd
 import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured
-import grails.validation.Validateable
 import groovy.util.logging.Slf4j
 import helpers.SuperHelper
 import org.springframework.http.HttpStatus
@@ -15,7 +15,9 @@ import org.springframework.http.HttpStatus
 @Slf4j
 @Transactional
 class CommitteeController {
-	static responseFormats = ['json', 'xml']
+	static responseFormats = ['json']
+
+    CommitteeService committeeService
 
     def index() { }
 
@@ -44,10 +46,7 @@ class CommitteeController {
             return
         }
 
-        Committee committee = new Committee(
-                name: form.name
-        )
-        committee.save(failOnError:true)
+        Committee committee = committeeService.create(form)
 
         render SuperHelper.renderCommittee(committee) as JSON
     }
@@ -68,32 +67,10 @@ class CommitteeController {
             return
         }
 
-        committee.name = form.name
+        committee = committeeService.update(committee, form)
 
         render SuperHelper.renderCommittee(committee) as JSON
     }
 
     def delete() {}
-}
-
-@GrailsCompileStatic
-class CreateCommitteeCmd implements Validateable {
-
-    String name
-
-    static constraints = {
-        name nullable: false
-    }
-}
-
-@GrailsCompileStatic
-class UpdateCommitteeCmd implements Validateable {
-
-    Long id
-    String name
-
-    static constraints = {
-        id nullable: false
-        name nullable: false
-    }
 }

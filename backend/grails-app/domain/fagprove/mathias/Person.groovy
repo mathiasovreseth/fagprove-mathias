@@ -81,7 +81,6 @@ class Person implements Serializable {
 
     protected void encodePassword() {
         if(this.password) {
-            log.debug('Updating password...')
             this.password = encode(this.password)
         }
     }
