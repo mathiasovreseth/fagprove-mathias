@@ -1,7 +1,9 @@
 package fagprove.mathias
 
+import fagprove.mathias.cmd.CreateCommitteeCmd
 import fagprove.mathias.cmd.CreateExaminationCmd
 import fagprove.mathias.cmd.CreatePersonCmd
+import fagprove.mathias.cmd.UpdateCommitteeCmd
 import fagprove.mathias.enums.PersonType
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
@@ -19,18 +21,17 @@ class InitService {
 
     PersonService personService
     ExaminationService examinationService
+    CommitteeService committeeService
 
     @Selector('gorm:datastoreInitialized')
     def init() {
         if(!Person.count()) {
-            Calendar c = Calendar.getInstance()
-
             Role admin = new Role(
                     authority: 'ROLE_ADMIN',
                     name: 'Administrator',
                     description: 'Administrator'
             )
-            admin.save(flush: true, failOnError: true)
+            admin.save(failOnError: true)
 
             Role user = new Role(
                     authority: 'ROLE_USER',
@@ -39,22 +40,23 @@ class InitService {
             )
             user.save(failOnError: true)
 
-
             Role manager = new Role(
                     authority: 'ROLE_MANAGER',
                     name: 'Bidragsyter',
                     description: 'Bidragsyter'
             )
-            manager.save(failOnError: true)
+            manager.save(flush:true, failOnError: true)
 
-            Committee dataelektronikar = new Committee(
-                    name: "Dataelektronikar"
+            Committee dataelektronikar = committeeService.create(
+                    new CreateCommitteeCmd(
+                            name: "Dataelektronikar"
+                    )
             )
-            dataelektronikar.save(failOnError: true)
-            Committee ikt_servicefag = new Committee(
-                    name: "IKT-servicefag"
+            Committee ikt_servicefag = committeeService.create(
+                    new CreateCommitteeCmd(
+                            name: "IKT-servicefag"
+                    )
             )
-            ikt_servicefag.save(flush:true, failOnError: true)
 
             personService.create(new CreatePersonCmd(
                     email: "kristoffer@munikum.no",
@@ -85,10 +87,11 @@ class InitService {
                     phoneNumber: "+4711223344",
                     role: 'ROLE_ADMIN',
                     committees: [
-                            Committee.findByName("Dataelektronikar").id,
-                            Committee.findByName("IKT-servicefag").id
+                            dataelektronikar.id
                     ]
             ))
+
+            Calendar c = Calendar.getInstance()
 
             c.set(2020, Calendar.FEBRUARY, 3)
             Date roarBusyStart = c.getTime()
@@ -105,12 +108,12 @@ class InitService {
                     phoneNumber: "+4711223344",
                     role: 'ROLE_MANAGER',
                     committees: [
-                            Committee.findByName("Dataelektronikar").id,
-                            Committee.findByName("IKT-servicefag").id
+                            dataelektronikar.id,
+                            ikt_servicefag.id
                     ]
             ))
 
-            personService.create(new CreatePersonCmd(
+            Person randi = personService.create(new CreatePersonCmd(
                     email: "randi@example.com",
                     name: "Randi Scheflo",
                     password: "testing",
@@ -119,9 +122,20 @@ class InitService {
                     phoneNumber: "+4711223344",
                     role: 'ROLE_MANAGER',
                     committees: [
-                            Committee.findByName("Dataelektronikar").id,
-                            Committee.findByName("IKT-servicefag").id
+                            ikt_servicefag.id
                     ]
+            ))
+
+            committeeService.update(dataelektronikar, new UpdateCommitteeCmd(
+                    id: dataelektronikar.id,
+                    name: dataelektronikar.name,
+                    leader: roar
+            ))
+
+            committeeService.update(ikt_servicefag, new UpdateCommitteeCmd(
+                    id: ikt_servicefag.id,
+                    name: ikt_servicefag.name,
+                    leader: randi
             ))
 
             c.set(2020, Calendar.MARCH, 10, 8, 0 ,0)

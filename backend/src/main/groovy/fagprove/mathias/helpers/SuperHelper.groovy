@@ -18,6 +18,13 @@ class SuperHelper {
         ]
     }
 
+    static Map renderPersonLimited(Person person) {
+        return [
+                id: person.id,
+                name: person.name
+        ]
+    }
+
     static Map renderExaminator(Person person) {
         Set<Committee> committees = person.committees
 
@@ -64,9 +71,18 @@ class SuperHelper {
     }
 
     static Map renderCommittee(Committee committee) {
+        def members = []
+        if(committee.members) {
+            for(Person person in committee.members) {
+                members.add(renderPersonLimited(person))
+            }
+        }
+
         return [
                 id: committee.id,
-                name: committee.name
+                name: committee.name,
+                members: members,
+                leader: committee.leader ? renderPersonLimited(committee.leader) : null
         ]
     }
 

@@ -6,6 +6,7 @@ import grails.compiler.GrailsCompileStatic
 class Committee {
 
     String name
+    Person leader
 
     static mappedBy = [
             members: "committees"
@@ -17,6 +18,7 @@ class Committee {
 
     static constraints = {
         name nullable: false
+        leader nullable: true
     }
 
     static mapping = {

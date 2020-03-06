@@ -72,5 +72,19 @@ class CommitteeController {
         render SuperHelper.renderCommittee(committee) as JSON
     }
 
-    def delete() {}
+    def delete(Long id) {
+        Committee committee = Committee.findById(id)
+
+        if(!committee) {
+            log.error("Committee with id $id not found")
+            render status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        committee.delete(flush:true, failOnError: true)
+
+        log.info("Committee $committee.name deleted")
+
+        render status: HttpStatus.OK
+    }
 }

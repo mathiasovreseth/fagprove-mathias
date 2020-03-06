@@ -11,7 +11,8 @@ class CommitteeService {
 
     Committee create(CreateCommitteeCmd form) {
         Committee committee = new Committee(
-                name: form.name
+                name: form.name,
+                leader: form.leader
         )
         committee.save(failOnError:true)
 
@@ -26,6 +27,7 @@ class CommitteeService {
         }
 
         committee.name = form.name
+        committee.leader = form.leader
 
         committee.save(failOnError:true)
 
