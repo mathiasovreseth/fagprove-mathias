@@ -34,7 +34,15 @@ class CommitteeController {
     }
 
     def show(Long id) {
-        render SuperHelper.renderCommittee(Committee.findById(id)) as JSON
+        Committee committee = Committee.findById(id)
+
+        if(!committee) {
+            log.error("Committee with id $id not found")
+            render status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        render SuperHelper.renderCommittee(committee) as JSON
     }
 
     def create(CreateCommitteeCmd form) {

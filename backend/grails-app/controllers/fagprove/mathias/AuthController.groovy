@@ -27,6 +27,7 @@ class AuthController {
 
     def login(LoginCommand form) {
         if(form.hasErrors()) {
+            log.error(form.errors.toString())
             render text: '', status: BAD_REQUEST
             return
         }
