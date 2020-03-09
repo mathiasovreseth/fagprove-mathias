@@ -19,3 +19,7 @@ I Postman:
 
 1. Trykk import
 2. Velg fila `Fagprove.postman_collection.json`
+
+## API dokumentasjon
+
+Opne `index.html` i `api-docs` mappa
