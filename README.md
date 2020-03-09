@@ -6,6 +6,16 @@
 sudo docker-compose up
 ```
 
+### Database info
+
+Parameter | Verdi
+------------ | -------------
+Host | localhost
+Port | 6000
+User | fagprove
+Passord | mathias
+Database | fagprove
+
 ## Start backend
 
 ```bash
