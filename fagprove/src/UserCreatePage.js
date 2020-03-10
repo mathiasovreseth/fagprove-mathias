@@ -101,7 +101,7 @@ export function UserCreatePage() {
   useEffect(() => {
     fetchUsers();
   }, []);
-
+  console.log(person.committees);
   return (
     <div style={{margin: '0 auto'}}>
       <form onSubmit={async (e)=> {
@@ -221,7 +221,7 @@ export function UserCreatePage() {
         <Dropdown onChange={(role)=> {
           setPerson({
             ...person,
-            comiteees : role[0].id
+            committees : role[0].value
           })
         }} multi={false} items={comitees}/>
       </div>
