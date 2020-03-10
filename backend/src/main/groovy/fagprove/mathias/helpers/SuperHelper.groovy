@@ -7,6 +7,13 @@ import grails.compiler.GrailsCompileStatic
 @GrailsCompileStatic
 class SuperHelper {
     static Map renderPerson(Person person) {
+        Set<Committee> committees = person.committees
+
+        def c = []
+        for(Committee committee in committees) {
+            c.add(renderCommittee(committee))
+        }
+
         return [
                 id: person.id,
                 email: person.email,
@@ -15,7 +22,8 @@ class SuperHelper {
                 lastUpdated: person.lastUpdated,
                 description: person.description,
                 personType: person.personType.name(),
-                roles: renderPersonRole(PersonRole.findAllByPerson(person))
+                roles: renderPersonRole(PersonRole.findAllByPerson(person)),
+                committees: c
         ]
     }
 

@@ -25,6 +25,13 @@ class PersonController {
 
     def index() { }
 
+    @Secured('ROLE_USER')
+    def me() {
+        Person currentUser = (Person)springSecurityService.getCurrentUser()
+
+        render SuperHelper.renderPerson(currentUser) as JSON
+    }
+
     def listCandidates() {
         List<Person> persons = Person.findAllByPersonType(PersonType.CANDIDATE)
 
