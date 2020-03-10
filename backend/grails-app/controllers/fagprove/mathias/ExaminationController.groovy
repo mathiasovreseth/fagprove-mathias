@@ -142,7 +142,6 @@ class ExaminationController {
         render SuperHelper.renderExamination(examination) as JSON
     }
 
-    @Secured('ROLE_MANAGER')
     def create(CreateExaminationCmd form) {
         form.validate()
 
@@ -150,6 +149,28 @@ class ExaminationController {
             log.error(form.errors.toString())
             render status: HttpStatus.BAD_REQUEST
             return
+        }
+
+        if(form.candidate.personType != PersonType.CANDIDATE) {
+            log.error("Candidate must be of type CANDIDATE!")
+            render status: HttpStatus.BAD_REQUEST
+            return
+        }
+
+        Person currentUser = (Person)springSecurityService.getCurrentUser()
+
+        if(!SuperHelper.isAdmin(currentUser)) {
+            // Check if user is set as an examinator
+            if(form.responsibleExaminator.id != currentUser.id &&
+                    form.secondaryExaminator.id != currentUser.id) {
+                // If not user must be leader of committee
+                Committee c = form.candidate.committees[0]
+                if(c.leader.id != currentUser.id) {
+                    log.error("User is not allowed to create this examination")
+                    render status: HttpStatus.FORBIDDEN
+                    return
+                }
+            }
         }
 
         Examination examination = examinationService.create(form)
@@ -163,7 +184,6 @@ class ExaminationController {
         render SuperHelper.renderExamination(examination) as JSON
     }
 
-    @Secured('ROLE_MANAGER')
     def update(UpdateExaminationCmd form) {
         form.validate()
 
@@ -181,6 +201,34 @@ class ExaminationController {
             return
         }
 
+        Person currentUser = (Person)springSecurityService.getCurrentUser()
+
+        if(!SuperHelper.isAdmin(currentUser)) {
+            // Check if user is set as an examinator on saved examination
+            if(examination.responsibleExaminator.id != currentUser.id &&
+                    examination.secondaryExaminator.id != currentUser.id) {
+                // If not user must be leader of committee
+                Committee c = examination.candidate.committees[0]
+                if(c.leader.id != currentUser.id) {
+                    log.error("User is not allowed to update this examination")
+                    render status: HttpStatus.FORBIDDEN
+                    return
+                }
+            }
+
+            // Check if user is set as an examinator on updated examination
+            if(form.responsibleExaminator.id != currentUser.id &&
+                    form.secondaryExaminator.id != currentUser.id) {
+                // If not user must be leader of committee
+                Committee c = form.candidate.committees[0]
+                if(c.leader.id != currentUser.id) {
+                    log.error("User is not allowed to update this examination")
+                    render status: HttpStatus.FORBIDDEN
+                    return
+                }
+            }
+        }
+
         examination = examinationService.update(examination, form)
 
         if(!examination) {
@@ -192,7 +240,6 @@ class ExaminationController {
         render SuperHelper.renderExamination(examination) as JSON
     }
 
-    @Secured('ROLE_MANAGER')
     def delete(Long id) {
         Examination examination = Examination.findById(id)
 
@@ -200,6 +247,22 @@ class ExaminationController {
             log.error("Examination with id $id not found")
             render status: HttpStatus.NOT_FOUND
             return
+        }
+
+        Person currentUser = (Person)springSecurityService.getCurrentUser()
+
+        if(!SuperHelper.isAdmin(currentUser)) {
+            // Check if user is set as an examinator on saved examination
+            if(examination.responsibleExaminator.id != currentUser.id &&
+                    examination.secondaryExaminator.id != currentUser.id) {
+                // If not user must be leader of committee
+                Committee c = examination.candidate.committees[0]
+                if(c.leader.id != currentUser.id) {
+                    log.error("User is not allowed to delete this examination")
+                    render status: HttpStatus.FORBIDDEN
+                    return
+                }
+            }
         }
 
         examination.delete(flush:true, failOnError: true)

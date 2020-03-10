@@ -1,6 +1,7 @@
 package fagprove.mathias.helpers
 
 import fagprove.mathias.*
+import fagprove.mathias.enums.PersonType
 import grails.compiler.GrailsCompileStatic
 
 @GrailsCompileStatic
@@ -63,18 +64,24 @@ class SuperHelper {
                 region: person.region,
                 registrationReceived: person.registrationReceived,
                 examinationPlanned: examination != null,
-                examinationStartDate: examination.startDate,
-                examinationEndDate: examination.endDate,
-                examinationResponsible: renderExaminator(examination.responsibleExaminator),
-                examinationSecondary: renderExaminator(examination.secondaryExaminator),
+                examinationStartDate: examination ? examination.startDate : null,
+                examinationEndDate: examination ? examination.endDate : null,
+                examinationResponsible: examination ? renderExaminator(examination.responsibleExaminator) : null,
+                examinationSecondary: examination ? renderExaminator(examination.secondaryExaminator) : null,
+                committee: person.committees[0] ? renderCommittee(person.committees[0]) : null
         ]
     }
 
     static Map renderCommittee(Committee committee) {
         def members = []
+        def candidates = []
         if(committee.members) {
             for(Person person in committee.members) {
-                members.add(renderPersonLimited(person))
+                if(person.personType == PersonType.CANDIDATE) {
+                    candidates.add(renderPersonLimited(person))
+                } else if(person.personType == PersonType.EXAMINATOR) {
+                    members.add(renderPersonLimited(person))
+                }
             }
         }
 
@@ -82,7 +89,8 @@ class SuperHelper {
                 id: committee.id,
                 name: committee.name,
                 members: members,
-                leader: committee.leader ? renderPersonLimited(committee.leader) : null
+                leader: committee.leader ? renderPersonLimited(committee.leader) : null,
+                candidates: candidates
         ]
     }
 

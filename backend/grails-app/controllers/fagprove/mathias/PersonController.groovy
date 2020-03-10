@@ -28,10 +28,25 @@ class PersonController {
     def listCandidates() {
         List<Person> persons = Person.findAllByPersonType(PersonType.CANDIDATE)
 
+        Person currentUser = (Person)springSecurityService.getCurrentUser()
+        boolean isAdmin = SuperHelper.isAdmin(currentUser)
+
         def retVal = []
 
         for(Person person in persons) {
-            retVal.add(SuperHelper.renderCandidate(person))
+            if(isAdmin) {
+                retVal.add(SuperHelper.renderCandidate(person))
+                continue
+            }
+
+            for(Committee c in person.committees) {
+                for(Committee c2 in currentUser.committees) {
+                    if(c.id == c2.id) {
+                        retVal.add(SuperHelper.renderCandidate(person))
+                        break
+                    }
+                }
+            }
         }
 
         render retVal as JSON

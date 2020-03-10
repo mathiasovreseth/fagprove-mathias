@@ -75,7 +75,10 @@ class InitService {
                     region: "Stad kommune",
                     company: "Munikum AS",
                     registrationReceived: true,
-                    role: 'ROLE_USER'
+                    role: 'ROLE_USER',
+                    committees: [
+                            dataelektronikar.id
+                    ]
             ))
 
             Person roar = personService.create(new CreatePersonCmd(
@@ -85,7 +88,7 @@ class InitService {
                     personType: PersonType.EXAMINATOR,
                     jobRole: "Medlem",
                     phoneNumber: "+4711223344",
-                    role: 'ROLE_ADMIN',
+                    role: 'ROLE_MANAGER',
                     committees: [
                             dataelektronikar.id,
                             ikt_servicefag.id

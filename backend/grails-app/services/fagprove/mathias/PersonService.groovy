@@ -2,6 +2,7 @@ package fagprove.mathias
 
 import fagprove.mathias.cmd.CreatePersonCmd
 import fagprove.mathias.cmd.UpdatePersonCmd
+import fagprove.mathias.enums.PersonType
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 
@@ -13,6 +14,17 @@ class PersonService {
         if(Person.findByEmail(form.email)) {
             log.error("A person with this email already exists!")
             return null
+        }
+
+        if(form.personType == PersonType.CANDIDATE) {
+            if(!form.committees || form.committees.size() == 0) {
+                log.error("A candidate must have a committee!")
+                return null
+            }
+            if(form.committees.size() > 1) {
+                log.error("A candidate can only have one committee!")
+                return null
+            }
         }
 
         Role role = Role.findByAuthority(form.role)
