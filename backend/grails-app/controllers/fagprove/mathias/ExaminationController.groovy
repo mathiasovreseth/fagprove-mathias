@@ -74,6 +74,7 @@ class ExaminationController {
             for(Person examinator in examinators) {
                 def m = [:]
 
+                m.id = examinator.id
                 m.name = examinator.name
 
                 boolean isBusy = false
