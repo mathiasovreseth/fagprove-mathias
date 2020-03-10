@@ -124,9 +124,10 @@ class PersonController {
             }
         }
 
-        if(form.role == 'ROLE_ADMIN' ||
-                person.getAuthorities().contains('ROLE_ADMIN')
-        ) {
+        List<PersonRole> personRoles = PersonRole.findAllByPerson(person)
+        String personRole = personRoles[0].role.authority
+
+        if(form.role == 'ROLE_ADMIN' || personRole == 'ROLE_ADMIN') {
             if(!SuperHelper.isAdmin(currentUser)) {
                 log.error("Only admins can update other admins!")
                 render status: HttpStatus.FORBIDDEN
