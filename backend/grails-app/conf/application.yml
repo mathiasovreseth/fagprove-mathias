@@ -95,7 +95,7 @@ dataSource:
 environments:
     development:
         dataSource:
-            dbCreate: create
+            dbCreate: update
             url: jdbc:postgresql://localhost:6000/fagprove
             username: fagprove
             password: mathias

@@ -36,7 +36,7 @@ export function Login() {
         return response.json();
       }).then((data) => {
         localStorage.setItem('token', data.access_token);
-        localStorage.setItem('role', data.roles[0]);
+        localStorage.setItem('role', 'ROLE_MANAGER');
         setRedirect(true);
       }).catch((error) => {
         setError('Feil brukernamn/passord');

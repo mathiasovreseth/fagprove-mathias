@@ -101,7 +101,6 @@ export function UserCreatePage() {
   useEffect(() => {
     fetchUsers();
   }, []);
-  console.log(person.committees);
   return (
     <div style={{margin: '0 auto'}}>
       <form onSubmit={async (e)=> {
@@ -155,7 +154,6 @@ export function UserCreatePage() {
            } else {
              alert('Du har ikkje rettighenae til å lage en adminbruker');
              window.location.reload();
-
              setPerson({
                ...person,
                role: 'ROLE_USER'
