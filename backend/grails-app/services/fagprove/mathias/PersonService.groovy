@@ -10,7 +10,17 @@ import grails.gorm.transactions.Transactional
 class PersonService {
 
     Person create(CreatePersonCmd form) {
+        if(Person.findByEmail(form.email)) {
+            log.error("A person with this email already exists!")
+            return null
+        }
+
         Role role = Role.findByAuthority(form.role)
+
+        if(!role) {
+            log.error("Role $form.role does not exists!")
+            return null
+        }
 
         Person person = new Person(
                 email: form.email,
@@ -41,6 +51,13 @@ class PersonService {
     }
 
     Person update(Person person, UpdatePersonCmd form) {
+        if(Person.findByEmail(form.email) &&
+                Person.findByEmail(form.email) != person
+        ) {
+            log.error("A person with this email already exists!")
+            return null
+        }
+
         person.email = form.email
         person.name = form.name
         person.password = form.password
