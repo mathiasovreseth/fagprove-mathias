@@ -16,6 +16,16 @@ class ExaminationService {
                 form.candidate, true
         )
 
+        if(form.endDate.getTime() - form.startDate.getTime() < 0) {
+            log.error("End date can't be before start date!")
+            return null
+        }
+
+        if(form.endDate.getTime() - form.startDate.getTime() < 1000 * 60 * 60 * 24) {
+            log.error("Examination must last at least one day!")
+            return null
+        }
+
         if(existingExamination) {
             log.error("Candidate $form.candidate.name already has an active examination!")
             return null
@@ -51,6 +61,16 @@ class ExaminationService {
     Examination update(Examination examination, UpdateExaminationCmd form) {
         if(!examination) {
             examination = Examination.findById(form.id)
+        }
+
+        if(form.endDate.getTime() - form.startDate.getTime() < 0) {
+            log.error("End date can't be before start date!")
+            return null
+        }
+
+        if(form.endDate.getTime() - form.startDate.getTime() < 1000 * 60 * 60 * 24) {
+            log.error("Examination must last at least one day!")
+            return null
         }
 
         // Check for conflicts
@@ -104,8 +124,13 @@ class ExaminationService {
             }
         }
 
-        if(conflict) {
-            return true
+        List<BusyDay> busyDays1 = BusyDay.findAllByPerson(responsibleExaminator)
+        for(BusyDay busyDay in busyDays1) {
+            if(!busyDay.day.before(startDate) && !busyDay.day.after(endDate)) {
+                log.error("$responsibleExaminator.name is busy on this date!")
+                conflict = true
+                break
+            }
         }
 
         List<Examination> examinations2 = Examination.findAllByResponsibleExaminatorOrSecondaryExaminator(
@@ -119,6 +144,15 @@ class ExaminationService {
             if(e.startDate <= endDate &&
                     e.endDate >= startDate) {
                 log.error("$secondaryExaminator.name already has an examination on this date!")
+                conflict = true
+                break
+            }
+        }
+
+        List<BusyDay> busyDays2 = BusyDay.findAllByPerson(secondaryExaminator)
+        for(BusyDay busyDay in busyDays2) {
+            if(!busyDay.day.before(startDate) && !busyDay.day.after(endDate)) {
+                log.error("$secondaryExaminator.name is busy on this date!")
                 conflict = true
                 break
             }
