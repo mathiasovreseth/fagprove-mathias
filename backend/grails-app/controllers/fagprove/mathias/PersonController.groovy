@@ -62,13 +62,27 @@ class PersonController {
             return
         }
 
-        if(form.personType == PersonType.EXAMINATOR) {
-            Person currentUser = (Person)springSecurityService.getCurrentUser()
-            if(!SuperHelper.isAdmin(currentUser)) {
-                log.error("Only admins can create examinators")
-                render status: HttpStatus.FORBIDDEN
-                return
-            }
+        Person currentUser = (Person)springSecurityService.getCurrentUser()
+
+        if(form.personType == PersonType.EXAMINATOR &&
+                !SuperHelper.isAdmin(currentUser)) {
+            log.error("Only admins can create examinators")
+            render status: HttpStatus.FORBIDDEN
+            return
+        }
+
+        if(form.role == 'ROLE_ADMIN' &&
+                !SuperHelper.isAdmin(currentUser)) {
+            log.error("Only admins can create other admins!")
+            render status: HttpStatus.FORBIDDEN
+            return
+        }
+
+        if(form.personType == PersonType.CANDIDATE &&
+                form.role != 'ROLE_USER') {
+            log.error("Candidates can only be ROLE_USER!")
+            render status: HttpStatus.FORBIDDEN
+            return
         }
 
         Person person = personService.create(form)
@@ -98,15 +112,33 @@ class PersonController {
             return
         }
 
+        Person currentUser = (Person)springSecurityService.getCurrentUser()
+
         if(person.personType == PersonType.EXAMINATOR ||
                 form.personType == PersonType.EXAMINATOR
         ) {
-            Person currentUser = (Person)springSecurityService.getCurrentUser()
             if(!SuperHelper.isAdmin(currentUser)) {
                 log.error("Only admins can update examinators")
                 render status: HttpStatus.FORBIDDEN
                 return
             }
+        }
+
+        if(form.role == 'ROLE_ADMIN' ||
+                person.getAuthorities().contains('ROLE_ADMIN')
+        ) {
+            if(!SuperHelper.isAdmin(currentUser)) {
+                log.error("Only admins can update other admins!")
+                render status: HttpStatus.FORBIDDEN
+                return
+            }
+        }
+
+        if(form.personType == PersonType.CANDIDATE &&
+                form.role != 'ROLE_USER') {
+            log.error("Candidates can only be ROLE_USER!")
+            render status: HttpStatus.FORBIDDEN
+            return
         }
 
         person = personService.update(person, form)
