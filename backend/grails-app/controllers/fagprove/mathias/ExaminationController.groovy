@@ -62,7 +62,7 @@ class ExaminationController {
             def day = [:]
 
             day.day = c.get(Calendar.DATE)
-            day.dayOfWeek = c.get(Calendar.DAY_OF_WEEK)
+            day.dayOfWeek = SuperHelper.fixedDayOfWeek(c.get(Calendar.DAY_OF_WEEK))
             day.week = c.get(Calendar.WEEK_OF_YEAR)
             day.month = c.get(Calendar.MONTH)
             day.year = c.get(Calendar.YEAR)
