@@ -87,7 +87,8 @@ class InitService {
                     phoneNumber: "+4711223344",
                     role: 'ROLE_ADMIN',
                     committees: [
-                            dataelektronikar.id
+                            dataelektronikar.id,
+                            ikt_servicefag.id
                     ]
             ))
 
@@ -122,20 +123,20 @@ class InitService {
                     phoneNumber: "+4711223344",
                     role: 'ROLE_MANAGER',
                     committees: [
-                            ikt_servicefag.id
+                            dataelektronikar.id
                     ]
             ))
 
             committeeService.update(dataelektronikar, new UpdateCommitteeCmd(
                     id: dataelektronikar.id,
                     name: dataelektronikar.name,
-                    leader: roar
+                    leader: randi
             ))
 
             committeeService.update(ikt_servicefag, new UpdateCommitteeCmd(
                     id: ikt_servicefag.id,
                     name: ikt_servicefag.name,
-                    leader: randi
+                    leader: roar
             ))
 
             c.set(2020, Calendar.MARCH, 10, 8, 0 ,0)

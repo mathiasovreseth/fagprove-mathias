@@ -16,6 +16,8 @@ class UpdateExaminationCmd implements Validateable {
     Date startDate
     Date endDate
 
+    Boolean active
+
     static constraints = {
         id nullable: false
         candidate nullable: false
@@ -23,5 +25,6 @@ class UpdateExaminationCmd implements Validateable {
         secondaryExaminator nullable: false
         startDate nullable: false
         endDate nullable: false
+        active nullable: true
     }
 }

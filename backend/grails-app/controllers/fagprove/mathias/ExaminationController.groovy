@@ -8,20 +8,43 @@ import fagprove.mathias.helpers.SuperHelper
 import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
+import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import org.springframework.http.HttpStatus
 
 @GrailsCompileStatic
-@Secured('ROLE_USER')
+@Secured('ROLE_MANAGER')
 @Slf4j
 @Transactional
 class ExaminationController {
 	static responseFormats = ['json']
 
     ExaminationService examinationService
+    SpringSecurityService springSecurityService
 
     def index() { }
+
+    @Secured('ROLE_USER')
+    def myExamination() {
+        Person currentUser = (Person)springSecurityService.getCurrentUser()
+
+        if(currentUser.personType != PersonType.CANDIDATE) {
+            log.error("Person $currentUser.name is not a candidate")
+            render status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        Examination examination = Examination.findByCandidate(currentUser)
+
+        if(!examination) {
+            log.error("Candidate $currentUser.name has no examination")
+            render status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        render SuperHelper.renderExamination(examination) as JSON
+    }
 
     def calendar(CalendarListCmd form) {
         Calendar c = Calendar.getInstance()
@@ -130,6 +153,12 @@ class ExaminationController {
 
         Examination examination = examinationService.create(form)
 
+        if(!examination) {
+            log.error("Could not create examination")
+            render status: HttpStatus.CONFLICT
+            return
+        }
+
         render SuperHelper.renderExamination(examination) as JSON
     }
 
@@ -148,6 +177,14 @@ class ExaminationController {
         if(!examination) {
             log.error("Examination with id $form.id not found")
             render status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        examination = examinationService.update(examination, form)
+
+        if(!examination) {
+            log.error("Could not update examination with id $form.id")
+            render status: HttpStatus.CONFLICT
             return
         }
 
