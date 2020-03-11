@@ -6,6 +6,7 @@ import fagprove.mathias.helpers.SuperHelper
 import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
+import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import org.springframework.http.HttpStatus
@@ -18,21 +19,38 @@ class CommitteeController {
 	static responseFormats = ['json']
 
     CommitteeService committeeService
+    SpringSecurityService springSecurityService
 
     def index() { }
 
+    @Secured('ROLE_MANAGER')
     def list() {
         List<Committee> committees = Committee.findAll()
 
         def retVal = []
 
-        for(Committee committee in committees) {
-            retVal.add(SuperHelper.renderCommittee(committee))
+        Person currentUser = (Person)springSecurityService.getCurrentUser()
+
+        boolean isAdmin = SuperHelper.isAdmin(currentUser)
+
+        for(Committee c in committees) {
+            if(isAdmin) {
+                retVal.add(SuperHelper.renderCommittee(c))
+                continue
+            }
+
+            for(Committee c2 in currentUser.committees) {
+                if(c.id == c2.id) {
+                    retVal.add(SuperHelper.renderCommittee(c))
+                    break
+                }
+            }
         }
 
         render retVal as JSON
     }
 
+    @Secured('ROLE_MANAGER')
     def show(Long id) {
         Committee committee = Committee.findById(id)
 
@@ -42,7 +60,21 @@ class CommitteeController {
             return
         }
 
-        render SuperHelper.renderCommittee(committee) as JSON
+        Person currentUser = (Person)springSecurityService.getCurrentUser()
+
+        if(SuperHelper.isAdmin(currentUser)) {
+            render SuperHelper.renderCommittee(committee) as JSON
+            return
+        }
+
+        for(Committee c2 in currentUser.committees) {
+            if(committee.id == c2.id) {
+                render SuperHelper.renderCommittee(committee) as JSON
+                return
+            }
+        }
+
+        render text: 'Access denied', status: HttpStatus.FORBIDDEN
     }
 
     def create(CreateCommitteeCmd form) {
