@@ -79,8 +79,8 @@ class PersonController {
         form.validate()
 
         if(form.hasErrors()) {
-            log.error(form.errors.toString())
-            render status: HttpStatus.BAD_REQUEST
+            String s = form.errors.allErrors.each { log.error "{}", it }
+            render text: s, status: HttpStatus.BAD_REQUEST
             return
         }
 
@@ -122,8 +122,8 @@ class PersonController {
         form.validate()
 
         if(form.hasErrors()) {
-            log.error(form.errors.toString())
-            render status: HttpStatus.BAD_REQUEST
+            String s = form.errors.allErrors.each { log.error "{}", it }
+            render text: s, status: HttpStatus.BAD_REQUEST
             return
         }
 
@@ -181,8 +181,8 @@ class PersonController {
         form.validate()
 
         if(form.hasErrors()) {
-            log.error(form.errors.toString())
-            render status: HttpStatus.BAD_REQUEST
+            String s = form.errors.allErrors.each { log.error "{}", it }
+            render text: s, status: HttpStatus.BAD_REQUEST
             return
         }
 

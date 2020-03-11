@@ -9,38 +9,37 @@ import grails.gorm.transactions.Transactional
 @Transactional
 class ExaminationService {
 
-    Examination create(CreateExaminationCmd form) {
+    Examination create(CreateExaminationCmd form) throws ExaminationException {
+        if(form.endDate.getTime() - form.startDate.getTime() < 0) {
+            log.error("End date can't be before start date!")
+            throw new ExaminationException("End date can't be before start date!")
+        }
+
+        if(form.endDate.getTime() - form.startDate.getTime() < 1000 * 60 * 60 * 24) {
+            log.error("Examination must last at least one day!")
+            throw new ExaminationException("Examination must last at least one day!")
+        }
 
         // Check if candidate already has an examination
         Examination existingExamination = Examination.findByCandidateAndActive(
                 form.candidate, true
         )
-
-        if(form.endDate.getTime() - form.startDate.getTime() < 0) {
-            log.error("End date can't be before start date!")
-            return null
-        }
-
-        if(form.endDate.getTime() - form.startDate.getTime() < 1000 * 60 * 60 * 24) {
-            log.error("Examination must last at least one day!")
-            return null
-        }
-
         if(existingExamination) {
             log.error("Candidate $form.candidate.name already has an active examination!")
-            return null
+            throw new ExaminationException("Candidate $form.candidate.name already has an active examination!")
         }
 
         // Check for conflicts
-        if(checkExaminationConflict(
-                null,
-                form.responsibleExaminator,
-                form.secondaryExaminator,
-                form.startDate,
-                form.endDate
-        )) {
-            log.error("Conflict on examination dates!")
-            return null
+        try {
+            checkExaminationConflict(
+                    null,
+                    form.responsibleExaminator,
+                    form.secondaryExaminator,
+                    form.startDate,
+                    form.endDate
+            )
+        } catch(ExaminationException e) {
+            throw e
         }
 
         Examination examination = new Examination(
@@ -58,31 +57,32 @@ class ExaminationService {
         return examination
     }
 
-    Examination update(Examination examination, UpdateExaminationCmd form) {
+    Examination update(Examination examination, UpdateExaminationCmd form) throws ExaminationException {
         if(!examination) {
             examination = Examination.findById(form.id)
         }
 
         if(form.endDate.getTime() - form.startDate.getTime() < 0) {
             log.error("End date can't be before start date!")
-            return null
+            throw new ExaminationException("End date can't be before start date!")
         }
 
         if(form.endDate.getTime() - form.startDate.getTime() < 1000 * 60 * 60 * 24) {
             log.error("Examination must last at least one day!")
-            return null
+            throw new ExaminationException("Examination must last at least one day!")
         }
 
         // Check for conflicts
-        if(checkExaminationConflict(
-                examination,
-                form.responsibleExaminator,
-                form.secondaryExaminator,
-                form.startDate,
-                form.endDate
-        )) {
-            log.error("Conflict on examination dates!")
-            return null
+        try {
+            checkExaminationConflict(
+                    null,
+                    form.responsibleExaminator,
+                    form.secondaryExaminator,
+                    form.startDate,
+                    form.endDate
+            )
+        } catch(ExaminationException e) {
+            throw e
         }
 
         examination.candidate = form.candidate
@@ -99,15 +99,13 @@ class ExaminationService {
         return examination
     }
 
-    boolean checkExaminationConflict(
+    def checkExaminationConflict(
             Examination examination,
             Person responsibleExaminator,
             Person secondaryExaminator,
             Date startDate,
             Date endDate
-    ) {
-        boolean conflict = false
-
+    ) throws ExaminationException {
         List<Examination> examinations1 = Examination.findAllByResponsibleExaminatorOrSecondaryExaminator(
                 responsibleExaminator, responsibleExaminator
         )
@@ -119,8 +117,7 @@ class ExaminationService {
             if(e.startDate <= endDate &&
                     e.endDate >= startDate) {
                 log.error("$responsibleExaminator.name already has an examination on this date!")
-                conflict = true
-                break
+                throw new ExaminationException("$responsibleExaminator.name already has an examination on this date!")
             }
         }
 
@@ -128,8 +125,7 @@ class ExaminationService {
         for(BusyDay busyDay in busyDays1) {
             if(!busyDay.day.before(startDate) && !busyDay.day.after(endDate)) {
                 log.error("$responsibleExaminator.name is busy on this date!")
-                conflict = true
-                break
+                throw new ExaminationException("$responsibleExaminator.name is busy on this date!")
             }
         }
 
@@ -144,20 +140,16 @@ class ExaminationService {
             if(e.startDate <= endDate &&
                     e.endDate >= startDate) {
                 log.error("$secondaryExaminator.name already has an examination on this date!")
-                conflict = true
-                break
+                throw new ExaminationException("$secondaryExaminator.name already has an examination on this date!")
             }
         }
 
         List<BusyDay> busyDays2 = BusyDay.findAllByPerson(secondaryExaminator)
         for(BusyDay busyDay in busyDays2) {
             if(!busyDay.day.before(startDate) && !busyDay.day.after(endDate)) {
-                log.error("$secondaryExaminator.name is busy on this date!")
-                conflict = true
-                break
+                log.error("$secondaryExaminator.name already has an examination on this date!")
+                throw new ExaminationException("$secondaryExaminator.name already has an examination on this date!")
             }
         }
-
-        return conflict
     }
 }

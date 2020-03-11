@@ -146,8 +146,8 @@ class ExaminationController {
         form.validate()
 
         if(form.hasErrors()) {
-            log.error(form.errors.toString())
-            render status: HttpStatus.BAD_REQUEST
+            String s = form.errors.allErrors.each { log.error "{}", it }
+            render text: s, status: HttpStatus.BAD_REQUEST
             return
         }
 
@@ -173,11 +173,12 @@ class ExaminationController {
             }
         }
 
-        Examination examination = examinationService.create(form)
-
-        if(!examination) {
+        Examination examination
+        try {
+            examination = examinationService.create(form)
+        } catch(ExaminationException e) {
             log.error("Could not create examination")
-            render status: HttpStatus.CONFLICT
+            render text: e.getMessage(), status: HttpStatus.CONFLICT
             return
         }
 
@@ -188,8 +189,8 @@ class ExaminationController {
         form.validate()
 
         if(form.hasErrors()) {
-            log.error(form.errors.toString())
-            render status: HttpStatus.BAD_REQUEST
+            String s = form.errors.allErrors.each { log.error "{}", it }
+            render text: s, status: HttpStatus.BAD_REQUEST
             return
         }
 
@@ -229,7 +230,13 @@ class ExaminationController {
             }
         }
 
-        examination = examinationService.update(examination, form)
+        try {
+            examination = examinationService.update(examination, form)
+        } catch(ExaminationException e) {
+            log.error("Could not create examination")
+            render text: e.getMessage(), status: HttpStatus.CONFLICT
+            return
+        }
 
         if(!examination) {
             log.error("Could not update examination with id $form.id")
