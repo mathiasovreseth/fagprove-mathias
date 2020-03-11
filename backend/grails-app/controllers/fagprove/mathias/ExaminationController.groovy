@@ -121,10 +121,25 @@ class ExaminationController {
     def list() {
         List<Examination> examinations = Examination.findAll()
 
+        Person currentUser = (Person)springSecurityService.getCurrentUser()
+        boolean isAdmin = SuperHelper.isAdmin(currentUser)
+
         def retVal = []
 
         for(Examination examination in examinations) {
-            retVal.add(SuperHelper.renderExamination(examination))
+            if(isAdmin) {
+                retVal.add(SuperHelper.renderExamination(examination))
+                continue
+            }
+
+            for(Committee c in examination.candidate.committees) {
+                for(Committee c2 in currentUser.committees) {
+                    if(c.id == c2.id) {
+                        retVal.add(SuperHelper.renderExamination(examination))
+                        break
+                    }
+                }
+            }
         }
 
         render retVal as JSON
@@ -139,7 +154,23 @@ class ExaminationController {
             return
         }
 
-        render SuperHelper.renderExamination(examination) as JSON
+        Person currentUser = (Person)springSecurityService.getCurrentUser()
+
+        if(SuperHelper.isAdmin(currentUser)) {
+            render SuperHelper.renderExamination(examination) as JSON
+            return
+        }
+
+        for(Committee c in examination.candidate.committees) {
+            for(Committee c2 in currentUser.committees) {
+                if(c.id == c2.id) {
+                    render SuperHelper.renderExamination(examination) as JSON
+                    return
+                }
+            }
+        }
+
+        render text: 'Access denied', status: HttpStatus.FORBIDDEN
     }
 
     def create(CreateExaminationCmd form) {
@@ -153,7 +184,7 @@ class ExaminationController {
 
         if(form.candidate.personType != PersonType.CANDIDATE) {
             log.error("Candidate must be of type CANDIDATE!")
-            render status: HttpStatus.BAD_REQUEST
+            render text:'Candidate must be of type CANDIDATE!', status: HttpStatus.BAD_REQUEST
             return
         }
 
@@ -167,7 +198,7 @@ class ExaminationController {
                 Committee c = form.candidate.committees[0]
                 if(c.leader.id != currentUser.id) {
                     log.error("User is not allowed to create this examination")
-                    render status: HttpStatus.FORBIDDEN
+                    render text: 'User is not allowed to create this examination', status: HttpStatus.FORBIDDEN
                     return
                 }
             }

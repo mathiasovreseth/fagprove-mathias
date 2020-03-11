@@ -64,15 +64,54 @@ class PersonController {
 
         def retVal = []
 
+        Person currentUser = (Person)springSecurityService.getCurrentUser()
+
+        boolean isAdmin = SuperHelper.isAdmin(currentUser)
+
         for(Person person in persons) {
-            retVal.add(SuperHelper.renderExaminator(person))
+            if(isAdmin) {
+                retVal.add(SuperHelper.renderCandidate(person))
+                continue
+            }
+
+            def added = false
+            for(Committee c in person.committees) {
+                if(added) {
+                    break
+                }
+                for(Committee c2 in currentUser.committees) {
+                    if(c.id == c2.id) {
+                        retVal.add(SuperHelper.renderExaminator(person))
+                        added = true
+                        break
+                    }
+                }
+            }
         }
 
         render retVal as JSON
     }
 
     def show(Long id) {
-        render SuperHelper.renderPerson(Person.findById(id)) as JSON
+        Person currentUser = (Person)springSecurityService.getCurrentUser()
+
+        if(SuperHelper.isAdmin(currentUser)) {
+            render SuperHelper.renderPerson(Person.findById(id)) as JSON
+            return
+        }
+
+        Person person = Person.findById(id)
+
+        for(Committee c in person.committees) {
+            for(Committee c2 in currentUser.committees) {
+                if(c.id == c2.id) {
+                    render SuperHelper.renderPerson(person) as JSON
+                    return
+                }
+            }
+        }
+
+        render text: 'Access denied', status: HttpStatus.FORBIDDEN
     }
 
     def create(CreatePersonCmd form) {
