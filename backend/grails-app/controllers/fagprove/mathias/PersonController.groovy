@@ -128,29 +128,23 @@ class PersonController {
         if(form.personType == PersonType.EXAMINATOR &&
                 !SuperHelper.isAdmin(currentUser)) {
             log.error("Only admins can create examinators")
-            render status: HttpStatus.FORBIDDEN
+            render text: 'Only admins can create examinators', status: HttpStatus.FORBIDDEN
             return
         }
 
         if(form.role == 'ROLE_ADMIN' &&
                 !SuperHelper.isAdmin(currentUser)) {
             log.error("Only admins can create other admins!")
-            render status: HttpStatus.FORBIDDEN
+            render text: 'Only admins can create other admins!', status: HttpStatus.FORBIDDEN
             return
         }
 
-        if(form.personType == PersonType.CANDIDATE &&
-                form.role != 'ROLE_USER') {
-            log.error("Candidates can only be ROLE_USER!")
-            render status: HttpStatus.FORBIDDEN
-            return
-        }
-
-        Person person = personService.create(form)
-
-        if(!person) {
+        Person person
+        try {
+            person = personService.create(form)
+        } catch(ExaminationException e) {
             log.error("Could not create person")
-            render status: HttpStatus.INTERNAL_SERVER_ERROR
+            render text: e.getMessage(), status: HttpStatus.CONFLICT
             return
         }
 
@@ -196,18 +190,11 @@ class PersonController {
             }
         }
 
-        if(form.personType == PersonType.CANDIDATE &&
-                form.role != 'ROLE_USER') {
-            log.error("Candidates can only be ROLE_USER!")
-            render status: HttpStatus.FORBIDDEN
-            return
-        }
-
-        person = personService.update(person, form)
-
-        if(!person) {
+        try {
+            person = personService.update(person, form)
+        } catch(ExaminationException e) {
             log.error("Could not update person")
-            render status: HttpStatus.INTERNAL_SERVER_ERROR
+            render text: e.getMessage(), status: HttpStatus.CONFLICT
             return
         }
 

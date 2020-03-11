@@ -10,28 +10,34 @@ import grails.gorm.transactions.Transactional
 @Transactional
 class PersonService {
 
-    Person create(CreatePersonCmd form) {
+    Person create(CreatePersonCmd form) throws ExaminationException {
         if(Person.findByEmail(form.email)) {
             log.error("A person with this email already exists!")
-            return null
+            throw new ExaminationException("A person with this email already exists!")
         }
 
         if(form.personType == PersonType.CANDIDATE) {
             if(!form.committees || form.committees.size() == 0) {
                 log.error("A candidate must have a committee!")
-                return null
+                throw new ExaminationException("A candidate must have a committee!")
             }
             if(form.committees.size() > 1) {
                 log.error("A candidate can only have one committee!")
-                return null
+                throw new ExaminationException("A candidate can only have one committee!")
             }
+        }
+
+        if(form.personType == PersonType.CANDIDATE &&
+                form.role != 'ROLE_USER') {
+            log.error("Candidates can only be ROLE_USER!")
+            throw new ExaminationException("Candidates can only be ROLE_USER!")
         }
 
         Role role = Role.findByAuthority(form.role)
 
         if(!role) {
             log.error("Role $form.role does not exists!")
-            return null
+            throw new ExaminationException("Role $form.role does not exists!")
         }
 
         Person person = new Person(
@@ -62,12 +68,36 @@ class PersonService {
         return person
     }
 
-    Person update(Person person, UpdatePersonCmd form) {
+    Person update(Person person, UpdatePersonCmd form) throws ExaminationException {
         if(Person.findByEmail(form.email) &&
                 Person.findByEmail(form.email) != person
         ) {
             log.error("A person with this email already exists!")
-            return null
+            throw new ExaminationException("A person with this email already exists!")
+        }
+
+        if(form.personType == PersonType.CANDIDATE) {
+            if(!form.committees || form.committees.size() == 0) {
+                log.error("A candidate must have a committee!")
+                throw new ExaminationException("A candidate must have a committee!")
+            }
+            if(form.committees.size() > 1) {
+                log.error("A candidate can only have one committee!")
+                throw new ExaminationException("A candidate can only have one committee!")
+            }
+        }
+
+        if(form.personType == PersonType.CANDIDATE &&
+                form.role != 'ROLE_USER') {
+            log.error("Candidates can only be ROLE_USER!")
+            throw new ExaminationException("Candidates can only be ROLE_USER!")
+        }
+
+        Role role = Role.findByAuthority(form.role)
+
+        if(!role) {
+            log.error("Role $form.role does not exists!")
+            throw new ExaminationException("Role $form.role does not exists!")
         }
 
         person.email = form.email
