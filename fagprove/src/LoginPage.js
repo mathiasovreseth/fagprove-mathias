@@ -23,8 +23,8 @@ export function Login() {
         },
         method: 'POST',
         body: JSON.stringify({
-          email: 'kristoffer@munikum.no',
-          password: 'testing',
+          email: userName,
+          password: password,
         }),
       });
       fetch(request).then(response => {
@@ -36,7 +36,7 @@ export function Login() {
         return response.json();
       }).then((data) => {
         localStorage.setItem('token', data.access_token);
-        localStorage.setItem('role', 'ROLE_MANAGER');
+        localStorage.setItem('role', data.roles[0]);
         setRedirect(true);
       }).catch((error) => {
         setError('Feil brukernamn/passord');

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react';
-import { FormLabel, Input, TextVerySmall } from './BasicStyles';
+import { FlexDiv, FormLabel, Input, TextSmall, TextVerySmall } from './BasicStyles';
 import { Dropdown } from './Dropdown';
 import { IsAdminContext, superRequest } from './App';
 import { Button } from './Button';
@@ -72,6 +72,7 @@ const personType = [
 // ];
 export function UserCreatePage() {
   const [comitees, setComitees] = React.useState();
+  const [errorMessage, setErrorMessage] = React.useState();
   const adminConsumer = useContext(IsAdminContext);
   const [person, setPerson] = React.useState({
     email: '',
@@ -83,7 +84,7 @@ export function UserCreatePage() {
     company: '',
     region: '',
     registrationReceived: false,
-    committees: ''
+    committees: undefined
   });
 
 
@@ -96,7 +97,7 @@ export function UserCreatePage() {
       return {value: c.id, label: c.name};
     }));
   }
-
+  console.log(adminConsumer);
 
   useEffect(() => {
     fetchUsers();
@@ -108,30 +109,39 @@ export function UserCreatePage() {
         if(strengthColor(strengthIndicator(person.password)) === 'red') {
           return alert('For svakt passord');
         }
+        if(person.committees === undefined) {
+          return setErrorMessage('Personen må ha eit fagfelt')
+        }
         await superRequest('http://localhost:8080/person/create', {
           ...person
         }).then(c => {
-          window.location.reload();
+          if(typeof c === JSON) {
+            window.location.reload();
+          } else {
+            setErrorMessage(c);
+          }
         })
 
       }}>
       <div style={{marginTop: '1em'}}>
         <FormLabel>E-post</FormLabel>
-      <Input style={{marginTop: '1em'}} type={'e-mail'} value={person.email} onChange={(e)=> setPerson({
+        <FlexDiv>
+      <Input required style={{marginTop: '1em'}} type={'e-mail'} value={person.email} onChange={(e)=> setPerson({
         ...person,
         email: e.target.value
       })}/>
+        </FlexDiv>
       </div>
       <div style={{marginTop: '1em'}}>
         <FormLabel>Navn</FormLabel>
-        <Input style={{marginTop: '1em'}} type={'text'} value={person.name} onChange={(e)=> setPerson({
+        <Input required style={{marginTop: '1em'}} type={'text'} value={person.name} onChange={(e)=> setPerson({
           ...person,
           name: e.target.value
         })}/>
       </div>
       <div style={{marginTop: '1em'}}>
         <FormLabel>Passord</FormLabel>
-        <Input style={{marginTop: '1em'}} type={'password'} value={person.password} onChange={(e)=> setPerson({
+        <Input required style={{marginTop: '1em'}} type={'password'} value={person.password} onChange={(e)=> setPerson({
           ...person,
           password: e.target.value
         })}/>
@@ -144,7 +154,7 @@ export function UserCreatePage() {
       </div>
       <div style={{marginTop: '1em'}}>
         <FormLabel>Rolle</FormLabel>
-       <Dropdown   onChange={(role)=> {
+       <Dropdown  required onChange={(role)=> {
          if(role[0].label === 'ROLE_ADMIN') {
            if(adminConsumer === 'ROLE_ADMIN') {
              setPerson({
@@ -168,7 +178,7 @@ export function UserCreatePage() {
 
        }} multi={false} items={roles}/>
       </div>
-      <div style={{marginTop: '1em'}}>
+      <div required style={{marginTop: '1em'}}>
         <FormLabel>type person</FormLabel>
         <Dropdown onChange={(role)=> {
           if(role.label === 'Admin') {
@@ -216,7 +226,7 @@ export function UserCreatePage() {
       }
       <div style={{marginTop: '1em'}}>
         <FormLabel>Fagfelt</FormLabel>
-        <Dropdown onChange={(role)=> {
+        <Dropdown  onChange={(role)=> {
           setPerson({
             ...person,
             committees : role[0].value
@@ -224,6 +234,7 @@ export function UserCreatePage() {
         }} multi={false} items={comitees}/>
       </div>
         <Button style={{marginTop: '1em'}} type={'submit'}>Oprett</Button>
+        <TextSmall style={{color: 'red'}}>{errorMessage}</TextSmall>
       </form>
     </div>
   )

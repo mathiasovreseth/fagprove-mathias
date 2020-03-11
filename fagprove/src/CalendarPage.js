@@ -14,15 +14,18 @@ import DatePicker from 'react-datepicker/es';
 
 
 const Cell = styled.div`
-margin-right: .5em;
 width: 4em;
-padding: .25em;
 box-sizing: border-box;
+display: flex;
+padding: .5em;
+align-items: center;
+justify-content: center;
 `;
 
 
 const ExaminationDiv = styled.div `
   background-color: yellow;
+  width: 100%;
   :hover {
     cursor: pointer;
   }
@@ -49,7 +52,8 @@ export function CalendarPage() {
     id: undefined,
   });
   const adminConsumer = useContext(IsAdminContext);
-  const hasPemission = adminConsumer === 'ROLE_ADMIN' || adminConsumer === 'ROLE_MANAGER';
+  const hasPemission = adminConsumer.role === 'ROLE_ADMIN' || adminConsumer.role === 'ROLE_MANAGER';
+  const isAdmin = adminConsumer.role === 'ROLE_ADMIN';
   // async function GetExaminations() {
   //   const fetch = await superRequest('http://localhost:8080/examination/list', {
   //   });
@@ -70,17 +74,17 @@ export function CalendarPage() {
   }
 
   function setDateAsBusy(date, person) {
-    console.log(date);
-    console.log(date);
-    console.log(person);
+
     const fromDate = new Date(date.year, date.month, date.day+1);
     const toDate = new Date(date.year, (date.month), (date.day+1));
-     superRequest('http://localhost:8080/person/setBusy', {
-      "person": person.id,
-      "from": fromDate,
-      "to": toDate,
-    });
-    window.location.reload();
+      superRequest('http://localhost:8080/person/setBusy', {
+        "person": person.id,
+        "from": fromDate,
+        "to": toDate,
+      });
+      window.location.reload();
+
+
   }
 
 
@@ -154,33 +158,38 @@ export function CalendarPage() {
                           {c.year}
                         </Cell>
                         <Cell>
-                          {c.day}
+                          {c.day}.{(c.month+1)}
                         </Cell>
                       </FlexDiv>
                     </div>
                   </div> {c.examinators.map(ex => {
-                    console.log(ex);
                   return (
                     <Cell style={{width: '8em', borderLeft: '1px solid #333'}}>
                       {ex.isBusy ?
-                        <div style={{backgroundColor: 'red', color: '#fff'}}>Opptatt</div>:
+                        <FlexDiv style={{width: '100%', justifyContent: 'center', height: '2em', backgroundColor: 'red', color: '#fff'}}>Opptatt</FlexDiv>:
                         ex.examinations && ex.examinations.length > 0 ?
                           <ExaminationDiv onClick={()=> {
                             if(hasPemission) {
                               setEdit({
                                 isEditing: true,
                                 id: ex.examinations[0].id,
-                              })
-                            }}
-                          }>
+                              });
+                            } else {
+                              alert('Du har ikkje tilgang til å redigere denne');
+                            }
+
+                          }}>
                               <TextSmall>{ex.examinations[0].candidate.name}</TextSmall>
                               <TextSmall>{ex.examinations[0].candidate.region}</TextSmall>
+                              <TextSmall style={{color: 'red'}}>{ex.examinations[0].responsibleExaminator.name}</TextSmall>
                             </ExaminationDiv>: <NoDataDiv style={{height: '2em', width: '100%'}}
                             onClick={()=> {
-                              if(hasPemission) {
+                              if(isAdmin || adminConsumer.me.id === ex.id) {
                                 if (window.confirm('sett som opptatt?')) {
                                   setDateAsBusy(c, ex);
                                 }
+                              } else {
+                                alert('Du har ikkje tilgang til å sette andre som opptatt');
                               }
                             }}
                           />

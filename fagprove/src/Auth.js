@@ -9,7 +9,7 @@ import { H1 } from './BasicStyles';
 export function AuthRoute({component: Component, isLoggedIn, isAuthenticated, ...rest}) {
   const adminConsumer = useContext(IsAdminContext);
   return <Route {...rest} render={props => (
-    adminConsumer
+    (adminConsumer.role === 'ROLE_ADMIN' || adminConsumer.role === 'ROLE_MANAGER')
       ? <Component {...props}/>
       : <Redirect to={ '/noAccess'}/>
   )}/>

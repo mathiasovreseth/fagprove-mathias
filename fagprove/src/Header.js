@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
-import styled from 'styled-components';
 import { IsAdminContext } from './App';
 import { Link } from 'react-router-dom';
 import {withRouter} from 'react-router-dom';
 import { FlexDiv, H3 } from './BasicStyles';
+import styled from 'styled-components';
 
 const OuterDiv = styled.div`
   display: flex;
@@ -29,6 +29,7 @@ const HeaderItem = styled(H3)`
 
 function HeaderComp(props) {
   const adminConsumer = useContext(IsAdminContext);
+  const hasAccess = (adminConsumer.role === 'ROLE_MANAGER' || adminConsumer.role === 'ROLE_ADMIN');
   return (
     <OuterDiv>
       <HeaderItem isActive={props.location.pathname.includes('/home')}>
@@ -37,23 +38,27 @@ function HeaderComp(props) {
         </Link>
       </HeaderItem>
       <FlexDiv>
+        {hasAccess &&
         <HeaderItem isActive={props.location.pathname.includes('/users')}>
           <Link className={'link'}  to={'/candidates'}>
-            Kandidatar
+            Brukere
           </Link>
         </HeaderItem>
-        {adminConsumer === 'ROLE_ADMIN' &&
+        }
+        {adminConsumer.role === 'ROLE_ADMIN' &&
         <HeaderItem isActive={props.location.pathname.includes('/users')}>
           <Link className={'link'}  to={'/committees'}>
             nemndmedlemmer
           </Link>
         </HeaderItem>
         }
+        {hasAccess &&
         <HeaderItem isActive={props.location.pathname.includes('/calendar')}>
           <Link className={'link'}  to={'/calendar'}>
             kalender
           </Link>
         </HeaderItem>
+        }
         <HeaderItem isActive={true} className={'link'} style={{color: '#fff'}} onClick={() => {
           props.onClickHeaderItem()
         }}>

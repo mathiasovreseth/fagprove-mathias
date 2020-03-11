@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { superRequest } from './App';
 import { Dropdown } from './Dropdown';
-import { FlexDiv, FormLabel } from './BasicStyles';
+import { FlexDiv, FormLabel, TextSmall } from './BasicStyles';
 
 import DatePicker, { registerLocale } from "react-datepicker";
 import nb from 'date-fns/locale/nb';
@@ -26,7 +26,7 @@ export function EditExaminationPage(props) {
   const [examinators, setExaminators] = React.useState();
 
 
-  const [showError, setShowError] = React.useState(false);
+  const [showError, setShowError] = React.useState('');
   const [formData, setFormData] = React.useState({
     startDate: new Date(),
     endDate: new Date(),
@@ -96,7 +96,11 @@ export function EditExaminationPage(props) {
             startDate: new Date(formData.startDate.getFullYear(), formData.startDate.getMonth(), formData.startDate.getDate(), 6),
             endDate: new Date(formData.endDate.getFullYear(), formData.endDate.getMonth(), formData.endDate.getDate(), 12)
           }).then(c => {
-            window.location.reload();
+            if (typeof c === 'object') {
+              window.location.reload();
+            } else {
+              setShowError(c);
+            }
           }).catch(error => {
 
           });
@@ -157,20 +161,23 @@ export function EditExaminationPage(props) {
             />
           </div>
           <FlexDiv>
-          <Button style={{marginTop: '1em'}} type={'submit'}>Opprett</Button>
-          <Button style={{marginTop: '1em', marginLeft: '2em', backgroundColor: 'red'}} onClick={async ()=> {
+          <Button style={{marginTop: '1em'}} type={'submit'}>Rediger</Button>
+          <Button style={{marginTop: '1em', marginLeft: '2em', backgroundColor: 'red'}} onClick={async (e)=> {
+            e.preventDefault();
             await superRequest('http://localhost:8080/examination/delete/'+props.id, {
             }).then(c => {
-              window.location.reload();
             }).catch(error => {
-
+              console.log(error);
+              setTimeout(()=> {
+                // window.location.reload();
+              }, 500);
             });
           }} >slett</Button>
           </FlexDiv>
         </div>
 
-        {showError &&
-        <div style={{color: 'red', marginTop: '.5em'}}>Fyll ut alle felta</div>
+        {showError.length > 0 &&
+        <TextSmall style={{color: 'red', marginTop: '.5em'}}>{showError}</TextSmall>
         }
       </form>
       }
