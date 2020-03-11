@@ -70,7 +70,7 @@ class PersonController {
 
         for(Person person in persons) {
             if(isAdmin) {
-                retVal.add(SuperHelper.renderCandidate(person))
+                retVal.add(SuperHelper.renderExaminator(person))
                 continue
             }
 
