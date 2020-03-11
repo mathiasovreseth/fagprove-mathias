@@ -182,12 +182,6 @@ class ExaminationController {
             return
         }
 
-        if(form.candidate.personType != PersonType.CANDIDATE) {
-            log.error("Candidate must be of type CANDIDATE!")
-            render text:'Candidate must be of type CANDIDATE!', status: HttpStatus.BAD_REQUEST
-            return
-        }
-
         Person currentUser = (Person)springSecurityService.getCurrentUser()
 
         if(!SuperHelper.isAdmin(currentUser)) {
@@ -243,7 +237,7 @@ class ExaminationController {
                 Committee c = examination.candidate.committees[0]
                 if(c.leader.id != currentUser.id) {
                     log.error("User is not allowed to update this examination")
-                    render status: HttpStatus.FORBIDDEN
+                    render text: 'User is not allowed to update this examination', status: HttpStatus.FORBIDDEN
                     return
                 }
             }
@@ -255,7 +249,7 @@ class ExaminationController {
                 Committee c = form.candidate.committees[0]
                 if(c.leader.id != currentUser.id) {
                     log.error("User is not allowed to update this examination")
-                    render status: HttpStatus.FORBIDDEN
+                    render text: 'User is not allowed to update this examination', status: HttpStatus.FORBIDDEN
                     return
                 }
             }
@@ -264,14 +258,8 @@ class ExaminationController {
         try {
             examination = examinationService.update(examination, form)
         } catch(ExaminationException e) {
-            log.error("Could not create examination")
+            log.error("Could not update examination")
             render text: e.getMessage(), status: HttpStatus.CONFLICT
-            return
-        }
-
-        if(!examination) {
-            log.error("Could not update examination with id $form.id")
-            render status: HttpStatus.CONFLICT
             return
         }
 

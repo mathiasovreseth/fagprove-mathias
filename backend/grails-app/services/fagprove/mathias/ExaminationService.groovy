@@ -2,6 +2,7 @@ package fagprove.mathias
 
 import fagprove.mathias.cmd.CreateExaminationCmd
 import fagprove.mathias.cmd.UpdateExaminationCmd
+import fagprove.mathias.enums.PersonType
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 
@@ -10,33 +11,14 @@ import grails.gorm.transactions.Transactional
 class ExaminationService {
 
     Examination create(CreateExaminationCmd form) throws ExaminationException {
-        if(form.endDate.getTime() - form.startDate.getTime() < 0) {
-            log.error("End date can't be before start date!")
-            throw new ExaminationException("End date can't be before start date!")
-        }
-
-        if(form.endDate.getTime() - form.startDate.getTime() < 1000 * 60 * 60 * 24) {
-            log.error("Examination must last at least one day!")
-            throw new ExaminationException("Examination must last at least one day!")
-        }
-
-        // Check if candidate already has an examination
-        Examination existingExamination = Examination.findByCandidateAndActive(
-                form.candidate, true
-        )
-        if(existingExamination) {
-            log.error("Candidate $form.candidate.name already has an active examination!")
-            throw new ExaminationException("Candidate $form.candidate.name already has an active examination!")
-        }
-
-        // Check for conflicts
         try {
             checkExaminationConflict(
                     null,
                     form.responsibleExaminator,
                     form.secondaryExaminator,
                     form.startDate,
-                    form.endDate
+                    form.endDate,
+                    form.candidate
             )
         } catch(ExaminationException e) {
             throw e
@@ -62,24 +44,15 @@ class ExaminationService {
             examination = Examination.findById(form.id)
         }
 
-        if(form.endDate.getTime() - form.startDate.getTime() < 0) {
-            log.error("End date can't be before start date!")
-            throw new ExaminationException("End date can't be before start date!")
-        }
-
-        if(form.endDate.getTime() - form.startDate.getTime() < 1000 * 60 * 60 * 24) {
-            log.error("Examination must last at least one day!")
-            throw new ExaminationException("Examination must last at least one day!")
-        }
-
         // Check for conflicts
         try {
             checkExaminationConflict(
-                    null,
+                    examination,
                     form.responsibleExaminator,
                     form.secondaryExaminator,
                     form.startDate,
-                    form.endDate
+                    form.endDate,
+                    form.candidate
             )
         } catch(ExaminationException e) {
             throw e
@@ -104,8 +77,43 @@ class ExaminationService {
             Person responsibleExaminator,
             Person secondaryExaminator,
             Date startDate,
-            Date endDate
+            Date endDate,
+            Person candidate
     ) throws ExaminationException {
+
+        if(responsibleExaminator.id == secondaryExaminator.id) {
+            log.error("Must have two different examinators!")
+            throw new ExaminationException("Must have two different examinators!")
+        }
+
+        if(candidate.personType != PersonType.CANDIDATE) {
+            log.error("Candidate must be of type CANDIDATE!")
+            throw new ExaminationException("Candidate must be of type CANDIDATE!")
+        }
+
+        if(endDate.getTime() - startDate.getTime() < 0) {
+            log.error("End date can't be before start date!")
+            throw new ExaminationException("End date can't be before start date!")
+        }
+
+        if(endDate.getTime() - startDate.getTime() < 1000 * 60 * 60 * 24) {
+            log.error("Examination must last at least one day!")
+            throw new ExaminationException("Examination must last at least one day!")
+        }
+
+        // Check if candidate already has an examination
+        Examination existingExamination = Examination.findByCandidateAndActive(
+                candidate, true
+        )
+        if(existingExamination) {
+            if(examination && existingExamination.id == examination.id) {
+                log.info("Updating same examination")
+            } else {
+                log.error("Candidate $candidate.name already has an active examination!")
+                throw new ExaminationException("Candidate $candidate.name already has an active examination!")
+            }
+        }
+
         List<Examination> examinations1 = Examination.findAllByResponsibleExaminatorOrSecondaryExaminator(
                 responsibleExaminator, responsibleExaminator
         )
