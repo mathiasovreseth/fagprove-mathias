@@ -15,7 +15,7 @@ export function Login() {
     return <Redirect to={'/home'} />
   }
   return (
-    <form onSubmit={(e) => {
+    <form style={{margin: '0 auto'}} onSubmit={(e) => {
       e.preventDefault();
       const request = new Request("http://localhost:8080/auth/login", {
         headers: {
@@ -23,8 +23,8 @@ export function Login() {
         },
         method: 'POST',
         body: JSON.stringify({
-          email: userName,
-          password: password,
+          email: 'kristoffer@munikum.no',
+          password: 'testing',
         }),
       });
       fetch(request).then(response => {

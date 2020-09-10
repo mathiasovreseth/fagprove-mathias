@@ -57,7 +57,6 @@ export async function superRequest(url, data) {
 
     return response.json();
   }).then(data => {
-    console.log(data);
     return data;
   })
 }
@@ -74,7 +73,6 @@ function App() {
     const res = await fetch;
 
     setMe(res);
-    console.log(res);
   }
 
   useEffect(() => {

@@ -9,6 +9,7 @@ import { Button } from './Button';
 import { Link } from 'react-router-dom';
 import { EditExaminationPage } from './EditExemenationPage';
 import DatePicker from 'react-datepicker/es';
+import {TopSectionCalendarPage} from "./TopSectionCalendarPage";
 
 
 
@@ -21,6 +22,7 @@ padding: .5em;
 align-items: center;
 justify-content: center;
 `;
+
 
 
 const ExaminationDiv = styled.div `
@@ -74,7 +76,6 @@ export function CalendarPage() {
   }
 
   function setDateAsBusy(date, person) {
-
     const fromDate = new Date(date.year, date.month, date.day+1);
     const toDate = new Date(date.year, (date.month), (date.day+1));
       superRequest('http://localhost:8080/person/setBusy', {
@@ -82,7 +83,9 @@ export function CalendarPage() {
         "from": fromDate,
         "to": toDate,
       });
+    window.setTimeout(()=> {
       window.location.reload();
+    }, 200);
 
 
   }
@@ -98,33 +101,10 @@ export function CalendarPage() {
         <div style={{width: '100%' }}>
         <EditExaminationPage id={editData.id}/>
         </div> :
-
         <div>
-          <FlexDiv style={{justifyContent: 'space-between',marginBottom: '5em'}}>
+          <TopSectionCalendarPage hasPermission={hasPemission} fromDate={fromDate} toDate={toDate} onToDateChange={(date)=> setToDate(date)} onFromDateChange={(date)=> setFromDate(date)}/>
+          <div style={{margin: '0 auto'}}>
             <FlexDiv>
-              <div>
-                <FormLabel>Fra:</FormLabel>
-
-              <DatePicker onSelect={(date)=> {
-                setFromDate(date);
-              }}  selected={fromDate}/>
-              </div>
-              <div style={{marginLeft: '1em'}}>
-                <FormLabel>Til:</FormLabel>
-              <DatePicker onSelect={(date)=> {
-                setToDate(date);
-              }} selected={toDate} />
-              </div>
-              </FlexDiv>
-            {hasPemission &&
-            <Link to={'/calendar/create/examination'}>
-              <Button >Ny eksemenasjon</Button>
-            </Link>
-            }
-
-          </FlexDiv>
-          <div style={{margin: '0 auto', width: '90%'}}>
-            <FlexDiv style={{}}>
               <Cell>Uke</Cell>
               <Cell>Veke dag</Cell>
               <Cell>år</Cell>
@@ -145,9 +125,7 @@ export function CalendarPage() {
                 <FlexDiv style={{borderBottom: '1px solid #333'}}>
                   <div>
                     <div key={c.day}>
-                      <FlexDiv style={{
-                        marginRight: '1em'
-                      }}>
+                      <FlexDiv style={{marginRight: '1em'}}>
                         <Cell>
                           {c.week}
                         </Cell>
@@ -165,7 +143,7 @@ export function CalendarPage() {
                   </div> {c.examinators.map(ex => {
                   return (
                     <Cell style={{width: '8em', borderLeft: '1px solid #333'}}>
-                      {ex.isBusy ?
+                      {ex.isBusy || (c.dayOfWeek === 6 || c.dayOfWeek === 7) ?
                         <FlexDiv style={{width: '100%', justifyContent: 'center', height: '2em', backgroundColor: 'red', color: '#fff'}}>Opptatt</FlexDiv>:
                         ex.examinations && ex.examinations.length > 0 ?
                           <ExaminationDiv onClick={()=> {

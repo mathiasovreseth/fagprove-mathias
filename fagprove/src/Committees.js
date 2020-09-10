@@ -70,7 +70,7 @@ export function Committees() {
           </tr>
 
           Nemnder
-          {comitees && comitees?.map(c => {
+          {comitees && comitees.map(c => {
             return <tr style={{marginLeft: '2em'}}>
               <td>{c.name}</td>
             </tr>
